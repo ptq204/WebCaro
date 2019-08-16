@@ -90,7 +90,7 @@ Winner: UserId-UUID
 **Response**:  
 ```json
 {
-    Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLzMzMDA0IiwidXNlcm5hbWUiOiJxdXllbnB0IiwidXNlcmlkIjozMzAwNCwiZXhwIjoxNTY3NTYzOTY5fQ.QHtTI8XFc3ghqbW1Z75AziUnLv_wyrmd_CIiFzs_qrM"
+    Authorization: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLzMzMDA0IiwidXNlcm5hbWUiOiJxdXllbnB0IiwidXNlcmlkIjozMzAwNCwiZXhwIjoxNTY3NTYzOTY5fQ.QHtTI8XFc3ghqbW1Z75AziUnLv_wyrmd_CIiFzs_qrM"
 }
 ```  
 
@@ -111,7 +111,6 @@ Winner: UserId-UUID
             "$oid": "5c5029a48249b51fe0f5c07e"
         },
         username: "quyenpt",
-        points: 0,
         rank: 0,
         winCount: 0,
         lossCount: 0
