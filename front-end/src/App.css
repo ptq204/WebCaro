@@ -1,0 +1,92 @@
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+.background-img {
+  background-image: url('/images/doodle-background.jpg');
+  height: 100%;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.background-color-effect {
+  background-color: #18BC9CCC;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  display: flex;
+  align-content: center;
+}
+
+.background-color-effect-dark {
+  background-color: #2C3E50CC;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  /* display: flex;
+  align-content: center;
+  flex-direction: column; */
+}
+
+.login-board {
+  width: 26%;
+  height: 65%;
+  background-color: #2C3E50;
+  margin: auto;
+  border-radius: 3%;
+}
+
+.leaderboard {
+  width: 49%;
+  height: 58%;
+  background-color: #2C3E50;
+  border-radius: 1%;
+  margin: auto;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-content: space-around;
+}
+
+.rank-item {
+  display: flex;
+  flex-direction: row;
+}
+
+.cell {
+  display: flex;
+  width: 25px;
+  height: 25px;
+  border-radius: 10%;
+  border-style: solid;
+  border-color: black;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.board {
+  display: flex;
+  align-content: flex-end;
+}
+
+.label-X {
+  color: red;
+  font-size: 20px;
+}
+
+.label-O {
+  color: blue;
+  font-size: 20px;
+}
+
