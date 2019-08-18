@@ -18,37 +18,30 @@
     <img src="images/architecture.png">
 </div>  
 
-## **Sequence diagram**  
-
-### **Login**  
+## **Game flow**  
 
 <div align="center">
-    <img src="images/sequence_diagram_login.png">
-</div>  
-
-### **Register**  
-
-<div align="center">
-    <img src="images/sequence_diagram_register.png">
+    <img src="images/caro-game-flow.png">
 </div>  
 
 ## **Database schema**  
 
 ### **User**  
-UserId: UUID  
+UserId: id  
 Username: String  
 Password: String  
 Points: int
 Rank: int
 WinCount: int
 LossCount: int
-GamePlayed: [GameId-UUID]
+GamePlayed: [id-GameId]  
 
 ### **Game**  
-GameId: UUID
-Creator: UserId-UUID
-Result: int
-Winner: UserId-UUID  
+GameId: id  
+Creator: UserId-id  
+CreatorName: string  
+Result: int  
+Winner: UserId-id  
 
 ## **Restful APIs specification**  
 
@@ -119,42 +112,18 @@ Winner: UserId-UUID
     roomList: [
         {
             roomName: "Game 01",
-            creator: "83df29a48249b51fe0f5c07e",
+            creator: "83df29a48249b51fe0f5c07e",  
+            creatorName: "quyenpt",
             createdAt: "Thu Aug 15 2019 09:40:23",
         },
         {
             rooName: "Game 02",
             creator: "83df29a48249b5dwqe23eo03",
+            creatorName: "nghipt", 
             createdAt: "Thu Aug 15 2019 09:33:51",
         },
         ...
     ]
-}
-```
-
-### **POST** */games*  
-
-**Description**: create new game room then return information of new game room.
-**Header**:  
-```json
-{
-    token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLzMzMDA0IiwidXNlcm5hbWUiOiJxdXllbnB0IiwidXNlcmlkIjozMzAwNCwiZXhwIjoxNTY3NTYzOTY5fQ.QHtTI8XFc3ghqbW1Z75AziUnLv_wyrmd_CIiFzs_qrM"
-}
-```
-**Body**:  
-```json
-{
-    room_name: "Go go go"
-}
-```  
-**Response**:  
-```json
-{
-    "_id": {
-        "$oid": "5c5029a48249b51fe0f5c07e"
-    },
-    result: 0,
-    winner: null
 }
 ```  
 
@@ -185,7 +154,7 @@ Winner: UserId-UUID
 
 ## **User interface**  
 
-See here: [Caro Web UI](https://www.figma.com/file/WNEsKYXfPxXJ0sr8HsB76z/CaroWeb?node-id=0%3A1)
+See here: [Caro Web UI](https://www.figma.com/file/WNEsKYXfPxXJ0sr8HsB76z/CaroWeb?node-id=0%3A1)  
 
 
 
