@@ -1,41 +1,55 @@
 import React, { Component } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import NavCustom from './NavCustom';
+import { gameRooms } from '../mock/data';
 
-class Login extends Component {
+class Home extends Component {
 	render() {
 		return (
 			<div className="background-img">
-				<div className="background-color-effect">
-					<div className="login-board">
-						<p style={{ fontSize: "35px", color: "white", textAlign: "center", marginTop: "50px" }}>Sign in</p>
-						<div style={{ display: "flex", justifyContent: "center", marginTop: "60px" }}>
-							<Form>
-								<div>
-									<Form.Group controlId="formBasicEmail" style={{ width: "250px" }}>
-										<Form.Control type="email" placeholder="Enter username" />
-									</Form.Group>
-								</div>
-								<div>
-									<Form.Group controlId="formBasicPassword" style={{ width: "250px" }}>
-										<Form.Control type="password" placeholder="Password" />
-									</Form.Group>
-								</div>
-							</Form>
-						</div>
+				<div className="background-color-effect-dark">
+					<NavCustom></NavCustom>
+					<div style={{ display: "flex", flexDirection: "column" }}>
 						<div style={{ display: "flex", justifyContent: "center" }}>
-							<Button variant="primary" type="submit" style={{ width: "150px", backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>
-								Login
-  						</Button>
+							<div className="home-create-join-button-container">
+								<Button style={{ marginRight: "20px", height: "40%" }}>Create room</Button>
+								<Button style={{ height: "40%" }}>Join random</Button>
+							</div>
 						</div>
-						<Link style={{ color: "white", fontSize: "15px", display: "flex", justifyContent: "center" }}>
-							Create new account
-						</Link>
+						<div className="container-scroll">
+							<div className="container-room-list-user-info">
+								<div style={{ width: "1000px", marginTop: "10px" }}>
+									<div className="room-list">
+										{
+											gameRooms.map((roomItem, index) => {
+												return this._renderRoomItem(roomItem, index);
+											})
+										}
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
+				</div>
+			</div>
+		);
+	}
+
+	_renderRoomItem = (roomItem, i) => {
+		return (
+			<div className="room-item">
+				<div style={{ width: "183px" }}>
+					<Link to={{ pathname: `/play/${roomItem.roomId}`, state: { roomId: roomItem.roomId } }} className="room-item-name">{roomItem.roomName}</Link>
+					<p className="room-item-creator">{roomItem.creatorName}</p>
+					<p className="room-item-created-at">1 minute ago</p>
+				</div>
+				<div className="room-item-join-button">
+					<Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>Join</Button>
 				</div>
 			</div>
 		);
 	}
 }
 
-export default Login;
+export default Home;

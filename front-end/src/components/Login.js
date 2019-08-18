@@ -8,7 +8,7 @@ class Login extends Component {
 			<div className="background-img">
 				<div className="background-color-effect">
 					<div className="login-board">
-						<p style={{ fontSize: "35px", color: "white", textAlign: "center", marginTop: "50px" }}>Sign in</p>
+						<p style={{ fontSize: "35px", color: "white", textAlign: "center", paddingTop: "60px" }}>Sign in</p>
 						<div style={{ display: "flex", justifyContent: "center", marginTop: "60px" }}>
 							<Form>
 								<div>

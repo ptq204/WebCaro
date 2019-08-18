@@ -54,6 +54,93 @@ body, html {
   align-content: space-around;
 }
 
+.container-nav {
+  display: flex;
+  flex-direction: row;
+  width: 1000px;
+  justify-content: center;
+}
+
+.container-nav-brand {
+  display: flex;
+  justify-content: flex-start;
+  width: 500px;
+}
+
+.container-nav-rank-logout {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 500px;
+}
+
+.container-scroll {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px
+}
+
+.container-room-list-user-info {
+  width: 1000px;
+}
+
+.home-create-join-button-container {
+  display: flex;
+  height: 100px;
+  align-items: flex-end;
+  width: 1000px;
+}
+
+.room-list {
+  width: 752px;
+  /* display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 2; */
+}
+
+.room-item {
+  display: flex;
+  flex-direction: row;
+  width: 366px;
+  background-color: #2C3E50D9;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.room-item-name {
+  color: white;
+  font-size: 30px; 
+  padding: 0;
+  margin: 0;
+  padding-top: 10px;
+}
+
+.room-item-creator {
+  color: #C6C2C2;
+  font-size: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.room-item-created-at {
+  color: white;
+  font-size: 15px;
+}
+
+.room-item-join-button {
+  display: flex;
+  width: 183px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .rank-item {
   display: flex;
   flex-direction: row;
