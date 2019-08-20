@@ -5,11 +5,11 @@ var userSchema = new mongoose.Schema({
     password: String,
     win: Number,
     loss: Number,
-})
+});
 
 userSchema.pre('save', (next) =>{
     let user = this;
-    if (!user.isModified('password')) {return next()};
+    if (!user.isModified('password')) {return next();}
     bcrypt.hash(user.password,10).then((hashedPass) => {
             user.password = hashedPass;
             next();

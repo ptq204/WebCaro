@@ -2,18 +2,32 @@ const UserDAO = require('../model/UserModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 const GameDAO = require('../model/GameModel');
-const secret="pGctNMl4LL4bEQSwCdIzdg"
+const secret="pGctNMl4LL4bEQSwCdIzdg";
 
 module.exports = {
-    createUser: (user) => {
-        newUser = new UserDAO({
-            username: user.username,
-            password: user.password,
-            win: 0,
-            loss: 0,
-        })
-        console.log("Created user: ",user);
-        newUser.save();
+    createUser: (user, callback) => {
+        UserDAO.findOne({username: user.username}, (err,user) => {
+            if (err) return handleError(err);
+            if (user) {
+                callback("exist");
+            } else {
+                newUser = new UserDAO({
+                    username: user.username,
+                    password: user.password,
+                    win: 0,
+                    loss: 0,
+                });
+                console.log("Created user: ",user);
+                newUser.save();
+                let token = jwt.sign(
+                    {id: newUser._id},
+                    secret,
+                    {expiresIn: '24h'}
+                );
+                callback(token);
+            }     
+        });
+        
     },
     authenticateUser: (inUser , callback) => {
         UserDAO.findOne({username: inUser.username}, (err, user) => {
@@ -28,7 +42,7 @@ module.exports = {
                         {expiresIn: '24h'}
                     );
                     callback(token);
-                } else {
+                } else { 
                     callback("Invalid");
                 }
             }
@@ -48,6 +62,18 @@ module.exports = {
                        callback(games);
                    });
            }
+        });
+    },
+    updateRank: (winnerId, loserId) => {
+        let earning = 100;
+        let losing = 100 * -1;
+        Promise.all([
+            UserDAO.findByIdAndUpdate(winnerId, {$inc: {rank: earning}}),
+            UserDAO.findByIdAndUpdate(loserId, {$inc: {rank: earning}})
+        ]).then(([winner, loser])=>{
+            
+        }).catch((err) => {
+            console.log('Error: ', err);
         });
     }
 };
