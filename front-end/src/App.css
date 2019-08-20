@@ -1,33 +1,179 @@
-.App {
-  text-align: center;
+body, html {
+  height: 100%;
+  margin: 0;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+.background-img {
+  background-image: url('/images/doodle-background.jpg');
+  height: 100%;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.background-color-effect {
+  background-color: #18BC9CCC;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  display: flex;
+  align-content: center;
+}
+
+.background-color-effect-dark {
+  background-color: #2C3E50CC;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  position: fixed;
+  /* display: flex;
+  align-content: center;
+  flex-direction: column; */
+}
+
+.login-board {
+  width: 26%;
+  height: 65%;
+  background-color: #2C3E50;
+  margin: auto;
+  border-radius: 3%;
+}
+
+.leaderboard {
+  width: 49%;
+  height: 58%;
+  background-color: #2C3E50;
+  border-radius: 1%;
+  margin: auto;
+  margin-top: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-content: space-around;
+}
+
+.container-nav {
+  display: flex;
+  flex-direction: row;
+  width: 1000px;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.container-nav-brand {
+  display: flex;
+  justify-content: flex-start;
+  width: 500px;
+}
+
+.container-nav-rank-logout {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 500px;
+}
+
+.container-scroll {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px
+}
+
+.container-room-list-user-info {
+  width: 1000px;
+}
+
+.home-create-join-button-container {
+  display: flex;
+  height: 100px;
+  align-items: flex-end;
+  width: 1000px;
+}
+
+.room-list {
+  width: 752px;
+  /* display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 2; */
+}
+
+.room-item {
+  display: flex;
+  flex-direction: row;
+  width: 366px;
+  background-color: #2C3E50D9;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.room-item-name {
   color: white;
+  font-size: 30px; 
+  padding: 0;
+  margin: 0;
+  padding-top: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.room-item-creator {
+  color: #C6C2C2;
+  font-size: 20px;
+  padding: 0;
+  margin: 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.room-item-created-at {
+  color: white;
+  font-size: 15px;
 }
+
+.room-item-join-button {
+  display: flex;
+  width: 183px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.rank-item {
+  display: flex;
+  flex-direction: row;
+}
+
+.cell {
+  display: flex;
+  width: 25px;
+  height: 25px;
+  border-radius: 10%;
+  border-style: solid;
+  border-color: black;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.board {
+  display: flex;
+  align-content: flex-end;
+}
+
+.label-X {
+  color: red;
+  font-size: 20px;
+}
+
+.label-O {
+  color: blue;
+  font-size: 20px;
+}
+
