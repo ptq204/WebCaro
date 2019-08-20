@@ -3,10 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var jwt = require('jsonwebtoken');
+const secret="pGctNMl4LL4bEQSwCdIzdg";
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var unguardRouter = require('./routes/unguard');
 
 var app = express();
 
@@ -20,7 +22,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use(unguardRouter);
+
+//jwt checking and setup
+app.use((req,res,next) => {
+  if (!req.headers.authorization){
+    res.json({
+      status: 1,
+    });
+  } else {
+    req.user = jwt.verify(req.header.authorization, secret);
+    next(); 
+  }
+});
+
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
