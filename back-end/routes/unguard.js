@@ -13,6 +13,7 @@ router.post("/login", (req,res) => {
       }
       res.json(body);
     };
+    console.log(req.body);
     userService.authenticateUser(req.body, callback);
   });
   
@@ -23,10 +24,11 @@ router.post("/register", (req,res) => {
         body.status = 100;
         } else {
         body.status = 0;
-        body.token = param;
+        body.token = params;
         }
         res.json(body);
     };
+    console.log(req.body);
     userService.createUser(req.body, callback);
 });
 

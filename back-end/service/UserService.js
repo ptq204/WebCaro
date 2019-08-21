@@ -1,14 +1,14 @@
 const UserDAO = require('../model/UserModel');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const GameDAO = require('../model/GameModel');
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 
 module.exports = {
     createUser: (user, callback) => {
-        UserDAO.findOne({username: user.username}, (err,user) => {
+        UserDAO.findOne({username: user.username}, (err,foundUser) => {
             if (err) return handleError(err);
-            if (user) {
+            if (foundUser) {
                 callback("exist");
             } else {
                 newUser = new UserDAO({
@@ -16,15 +16,18 @@ module.exports = {
                     password: user.password,
                     win: 0,
                     loss: 0,
+                    rank: 1000,
                 });
                 console.log("Created user: ",user);
-                newUser.save();
-                let token = jwt.sign(
-                    {id: newUser._id},
-                    secret,
-                    {expiresIn: '24h'}
-                );
-                callback(token);
+                saved = newUser.save((err) => {
+                    if (err) throw err;
+                    let token = jwt.sign(
+                        {id: newUser.id},
+                        secret,
+                        {expiresIn: '24h'}
+                    );
+                    callback(token);
+                });
             }     
         });
         
@@ -33,23 +36,25 @@ module.exports = {
         UserDAO.findOne({username: inUser.username}, (err, user) => {
             if (err) return handleError(err);
             if (!user){
+                console.log("not found");
                 callback("Invalid");
             } else {
                 if (bcrypt.compare(inUser.password,user.password)){
                     let token = jwt.sign(
-                        {id: user._id},
+                        {id: user.id},
                         secret,
                         {expiresIn: '24h'}
                     );
                     callback(token);
-                } else { 
+                } else {
+                    console.log("wrong pass ");
                     callback("Invalid");
                 }
             }
-        })
+        }); 
     },
     getGameHistory: (inUser, callback)  => {
-        UserDAO.findOne({username: inUser.username}, '_id', (err,user) => {
+        UserDAO.findOne({username: inUser.username}, (err,user) => {
            if (err) return handleError(err);
            if (!user){
                callback("Invalid");
@@ -68,12 +73,18 @@ module.exports = {
         let earning = 100;
         let losing = 100 * -1;
         Promise.all([
-            UserDAO.findByIdAndUpdate(winnerId, {$inc: {rank: earning}}),
-            UserDAO.findByIdAndUpdate(loserId, {$inc: {rank: earning}})
+            UserDAO.findByIdAndUpdate(winnerId, {$inc: {rank: earning, win: 1}}),
+            UserDAO.findByIdAndUpdate(loserId, {$inc: {rank: losing, loss: 1}})
         ]).then(([winner, loser])=>{
-            
+            console.log(winner,loser);
         }).catch((err) => {
             console.log('Error: ', err);
+        });
+    },
+    getId: (username, callback) => {
+        UserDAO.findOne({username:username}, (err,user) => {
+            if (err) return handleError(err);
+            callback(user.id);
         });
     }
 };
