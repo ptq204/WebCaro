@@ -8,7 +8,7 @@ router.get("/history", (req,res) => {
 
   };
   user = {};
-  user.username = req.body
+  user.username = req.body.usrId
   userService.getGameHistory ()
 });
 

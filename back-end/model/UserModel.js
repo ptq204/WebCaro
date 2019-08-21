@@ -7,7 +7,7 @@ var userSchema = new mongoose.Schema({
     loss: Number,
 });
 
-userSchema.pre('save', (next) =>{
+userSchema.pre('save', function(next){
     let user = this;
     if (!user.isModified('password')) {return next();}
     bcrypt.hash(user.password,10).then((hashedPass) => {

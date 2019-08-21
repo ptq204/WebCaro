@@ -1,14 +1,40 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var jwt = require('jsonwebtoken');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const jwt = require('jsonwebtoken');
+const mongoose = require( 'mongoose' ); 
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var unguardRouter = require('./routes/unguard');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const unguardRouter = require('./routes/unguard');
+
+
+var dbURI = "mongodb+srv://nghipt:skN1rHeACPFM2dKw@carogame-rcp4i.mongodb.net/test?retryWrites=true&w=majority"; 
+mongoose.connect(dbURI, {useNewUrlParser: true}); 
+mongoose.connection.on('connected', function () {  
+  console.log('Mongoose default connection open to ' + dbURI);
+}); 
+
+// If the connection throws an error
+mongoose.connection.on('error',function (err) {  
+  console.log('Mongoose default connection error: ' + err);
+}); 
+
+// When the connection is disconnected
+mongoose.connection.on('disconnected', function () {  
+  console.log('Mongoose default connection disconnected'); 
+});
+
+// If the Node process ends, close the Mongoose connection 
+process.on('SIGINT', function() {  
+  mongoose.connection.close(function () { 
+    console.log('Mongoose default connection disconnected through app termination'); 
+    process.exit(0); 
+  }); 
+}); 
 
 var app = express();
 
@@ -31,8 +57,17 @@ app.use((req,res,next) => {
       status: 1,
     });
   } else {
-    req.user = jwt.verify(req.header.authorization, secret);
-    next(); 
+    let token = req.authorization.split(" ");
+    jwt.verify(token[1], secret, (err, decoded) => {
+      if (err){
+         res.json({
+           status: 1
+         });
+      } else {
+        req.body.usrId = decoded;
+        next();
+      }
+    });
   }
 });
 
