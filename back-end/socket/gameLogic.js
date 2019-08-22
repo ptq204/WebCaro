@@ -13,7 +13,7 @@ const getCurrentDate = () => {
 const gameLogic = function(io){
     let roomId = "";
 
-    const leaveRoom = () => {
+    const leaveRoom = (socket) => {
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
         if (roomList[roomId].status === 0){
@@ -136,11 +136,11 @@ const gameLogic = function(io){
         });
         
         socket.on('leave-room', () => {
-            leaveRoom();
+            leaveRoom(socket);
         });
 
         socket.on(('disconnect'), (reason) => {
-            leaveRoom();
+            leaveRoom(socket);
             console.log("Disconnenct because " + reason); 
         });
     });
