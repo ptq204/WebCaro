@@ -6,6 +6,8 @@ const logger = require('morgan');
 const jwt = require('jsonwebtoken');
 const mongoose = require( 'mongoose' ); 
 const secret="pGctNMl4LL4bEQSwCdIzdg";
+const cors = require('cors');
+
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -47,7 +49,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cors());
 app.use(unguardRouter);
 
 //jwt checking and setup
