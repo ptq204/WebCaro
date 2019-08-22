@@ -6,41 +6,47 @@ import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
-import { changeRoomList } from '../actions/actions';
+import { changeRoomList, getUserInfo } from '../actions/actions';
+import { SERVER_URL } from '../config/config';
+import axios from 'axios';
 
-const mapRoomListStateToProps = state => {
-  return {roomList: state.changeRoomList.roomList}
+const mapStateToProps = state => {
+  return {
+    roomList: state.changeRoomList.roomList,
+    userInfo: state.getUserInfo.user
+  }
 }
 
-const mapDispatchRoomListToProps = (disPatch) => {
+const mapDispatchToProps = (disPatch) => {
   return {
-    changeRoomList: roomList => disPatch(changeRoomList(roomList))
+    changeRoomList: roomList => disPatch(changeRoomList(roomList)),
+    getUserInfo: user => disPatch(getUserInfo(user))
   }
 }
 
 class ConnectedHome extends Component {
 
   constructor(props) {
-    localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkNWUwZTJkZjc0OGY1NjkyNWEwMWZiMCIsImlhdCI6MTU2NjQ0NTEwMSwiZXhwIjoxNTY2NTMxNTAxfQ.-k1mJNs8s2Bf1-iWwuKxukxMCro5mT9yjExg4jjvB1I');
+    //localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkNWUwZTJkZjc0OGY1NjkyNWEwMWZiMCIsImlhdCI6MTU2NjQ0NTEwMSwiZXhwIjoxNTY2NTMxNTAxfQ.-k1mJNs8s2Bf1-iWwuKxukxMCro5mT9yjExg4jjvB1I');
     super(props);
-    this.socket = io('http://192.168.122.1:4000', {
+    this.socket = io(SERVER_URL, {
       query: {token: localStorage.getItem('token')}
     });
   }
 
+  componentWillMount() {
+    
+  }
+
   componentDidMount() {
-    // this.socket.on('new-room', (data) => {
-    //   let newRoom = {
-    //     roomName: 'room03',
-    //     roomId: data.detail.id,
-    //     creator: data.detail.id,
-    //     creatorName: data.detail.id,
-    //     createdAt: "Thu Aug 15 2019 09:40:23",
-    //   }
-    //   this.setState({
-    //     gameRooms: [...gameRooms, newRoom]
-    //   });
-    // });
+    this.socket.on('new-room', (data) => {
+      let newRoom = {
+        roomId: data.id,
+        roomName: 'room03',
+        creatorName: 'ptquyen'
+      }
+      this.props.changeRoomList([...this.props.roomList, newRoom])
+    });
   }
 
   render() {
@@ -68,24 +74,24 @@ class ConnectedHome extends Component {
               <Col md={4} className="user-info">
                 <Row className="user-rank-info-container">
                   <Col xs={10} className="user-rank-info">
-                    <p className="user-rank-info-username">{userInformation.username} KKK</p>
-                    <p className="user-rank-info-rank">Rank: {userInformation.rank} pts</p>
-                    uth.js        </Col>
-                  <Col xs={2} className="user-rank-info-badge-container">
-                    <img style={{ height: "90%" }} src={getRankBadge(userInformation.rank)}></img>
+                    <p className="user-rank-info-username">{this.props.userInfo.username} KKK</p>
+                    <p className="user-rank-info-rank">Rank: {this.props.userInfo.rank} pts</p>
+                  </Col>
+                  <Col xs={2} className="userhttp://10.200.232.42:4000-rank-info-badge-container">
+                    <img style={{ height: "90%" }} src={getRankBadge(this.props.userInfo.rank)}></img>
                   </Col>
                 </Row>
                 <Row style={{ height: "60%" }}>
                   <Col xs={6} className="user-game-statistic-win-loss">
                     <div>
                       <p style={{ color: "#18BC9C", fontSize: "20px" }}>Win</p>
-                      <p style={{ color: "white", fontSize: "25px" }}>{userInformation.winCount}</p>
+                      <p style={{ color: "white", fontSize: "25px" }}>{this.props.userInfo.win}</p>
                     </div>
                   </Col>
                   <Col xs={6} className="user-game-statistic-win-loss">
                     <div>
                       <p style={{ color: "#F33A3A", fontSize: "20px" }}>Loss</p>
-                      <p style={{ color: "white", fontSize: "25px" }}>{userInformation.lossCount}</p>
+                      <p style={{ color: "white", fontSize: "25px" }}>{this.props.userInfo.loss}</p>
                     </div>
                   </Col>
                 </Row>
@@ -117,8 +123,31 @@ class ConnectedHome extends Component {
     var roomName = 'room03';
     this.socket.emit('create-room', {'roomName': roomName});
   }
+
+  _queryUserInformation  = () => {
+    axios({
+      headers: {
+        Authentication: `Bearer ${localStorage.getItem('token')}`
+      },
+      method: 'GET',
+      url: `${SERVER_URL}/users/info`
+    }).then(res => {
+      if(res) {
+        const resInfo = JSON.stringify(res.data);
+        const data = JSON.parse(resInfo);
+        if(data) {
+          this.props.getUserInfo(data);
+        }
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+  }
 }
 
-const Home = connect(mapRoomListStateToProps, mapDispatchRoomListToProps)(ConnectedHome);
+const Home = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  )(ConnectedHome);
 
 export default Home;

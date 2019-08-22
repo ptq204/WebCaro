@@ -30,7 +30,6 @@ body, html {
   width: 100%;
   top: 0;
   position: fixed;
-  overflow-y: scroll;
   /* display: flex;
   align-content: center;
   flex-direction: column; */
@@ -81,14 +80,13 @@ body, html {
   justify-content: center;
   margin-top: 10px;
   height: 100%;
-  overflow: hidden;
 }
 
 .room-list-container-scroll {
   width: 140vmin;
   height: 100vh;
-  display: flex;
-  justify-content: center;
+  overflow-y: scroll;
+
 }
 
 .container-room-list-user-info {
@@ -106,6 +104,7 @@ body, html {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: flex-start;
   /* display: flex;
   flex-direction: column;
   flex-basis: 100%;
@@ -113,7 +112,7 @@ body, html {
 }
 
 .room-item {
-  width: 45vmin;
+  width: 43vmin;
   display: flex;
   flex-direction: row;
   background-color: #2C3E50D9;
@@ -122,6 +121,7 @@ body, html {
   margin-bottom: 10px;
   padding-left: 20px;
   padding-right: 20px;
+  height: 12vmin;
 }
 
 .room-item-name {
