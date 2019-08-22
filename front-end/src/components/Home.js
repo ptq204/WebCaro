@@ -5,11 +5,11 @@ import NavCustom from './NavCustom';
 import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
 import io from 'socket.io-client';
-import { changeRoomList } from '../actions/actions';
 import { connect } from 'react-redux';
+import { changeRoomList } from '../actions/actions';
 
 const mapRoomListStateToProps = state => {
-	return {roomList: state.changeRoomList.roomList}
+  return {roomList: state.changeRoomList.roomList}
 }
 
 const mapDispatchRoomListToProps = (disPatch) => {
@@ -18,18 +18,14 @@ const mapDispatchRoomListToProps = (disPatch) => {
   }
 }
 
-
 class ConnectedHome extends Component {
 
   constructor(props) {
+    localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkNWUwZTJkZjc0OGY1NjkyNWEwMWZiMCIsImlhdCI6MTU2NjQ0NTEwMSwiZXhwIjoxNTY2NTMxNTAxfQ.-k1mJNs8s2Bf1-iWwuKxukxMCro5mT9yjExg4jjvB1I');
     super(props);
     this.socket = io('http://192.168.122.1:4000', {
       query: {token: localStorage.getItem('token')}
     });
-    this.state = {
-      gameRooms: gameRooms
-    }
-    localStorage.setItem('token', )
   }
 
   componentDidMount() {
@@ -74,7 +70,7 @@ class ConnectedHome extends Component {
                   <Col xs={10} className="user-rank-info">
                     <p className="user-rank-info-username">{userInformation.username} KKK</p>
                     <p className="user-rank-info-rank">Rank: {userInformation.rank} pts</p>
-                  </Col>
+                    uth.js        </Col>
                   <Col xs={2} className="user-rank-info-badge-container">
                     <img style={{ height: "90%" }} src={getRankBadge(userInformation.rank)}></img>
                   </Col>

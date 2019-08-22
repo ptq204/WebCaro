@@ -1,10 +1,22 @@
 var roomList = [];
 const userService = require('../service/UserService');
+const secret="pGctNMl4LL4bEQSwCdIzdg";
 
 const gameLogic = function(io){
     let roomId = "";
     let userID = "";
-    io.on('connection', (socket) => {
+    io.use(function(socket, next){
+        if (socket.handshake.query && socket.handshake.query.token){
+          jwt.verify(socket.handshake.query.token, secret, function(err, decoded) {
+            if(err) return next(new Error('Authentication error'));
+            socket.decoded = decoded;
+            next();
+          });
+        } else {
+            next(new Error('Authentication error'));
+        }    
+    })
+    .on('connection', (socket) => {
         console.log('New user connected');
         socket.join('global');
         socket.on('create-room', (data) => {
@@ -86,28 +98,29 @@ const gameLogic = function(io){
             socket.to(roomId).emit('chat', data.msg);
         });
 
-        // socket.on(('disconnect'), () => {
-        //     socket.leave(roomId);
-        //     let userList = roomList[roomId].userList;
-        //     if (roomList[roomId].status === 0){
-        //         io.in('global').emit('room-close', {
-        //             id: roomId
-        //         });
-        //         delete roomList[roomId];
-        //     } else {
-        //         if (roomList[roomId].status === 2){
-        //             let winner = (userList.indexOf(userID) + 1) % 2;
-        //             userService.updateRank(userList[winner], userID);
-        //         }
-        //         let index = userList.indexOf(userID);
-        //         userList.slice(index,1);
-        //         roomList[roomId].status = 0;
-        //         roomList[roomId].replay = 0;
-        //         roomList[roomId].start_ack = 0;
-        //         socket.to(roomId).emit('other-disconnect',{});
-        //     }
-        //     roomId="";  
-        // });
+        socket.on(('disconnect'), (reason) => {
+            // socket.leave(roomId);
+            // let userList = roomList[roomId].userList;
+            // if (roomList[roomId].status === 0){
+            //     io.in('global').emit('room-close', {
+            //         id: roomId
+            //     });
+            //     delete roomList[roomId];
+            // } else {
+            //     if (roomList[roomId].status === 2){
+            //         let winner = (userList.indexOf(userID) + 1) % 2;
+            //         userService.updateRank(userList[winner], userID);
+            //     }
+            //     let index = userList.indexOf(userID);
+            //     userList.slice(index,1);
+            //     roomList[roomId].status = 0;
+            //     roomList[roomId].replay = 0;
+            //     roomList[roomId].start_ack = 0;
+            //     socket.to(roomId).emit('other-disconnect',{});
+            // }
+            // roomId=""; 
+            console.log("Disconnenct because " + reason); 
+        });
     });
 
 };
