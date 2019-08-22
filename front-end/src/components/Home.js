@@ -4,19 +4,20 @@ import { Link } from 'react-router-dom';
 import NavCustom from './NavCustom';
 import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
+import io from 'socket.io-client';
 
 class Home extends Component {
 
   constructor(props) {
     super(props);
-    this.socket = io('http://10.200.232.42:4000');
+    this.socket = io('http://127.0.0.1:4000');
     this.state = {
       gameRooms: gameRooms
     }
   }
 
   componentDidMount() {
-    this.socket.on('new-room', (data) => {
+    this.socket.on('new-room', (data) => {  
       let newRoom = {
         roomName: 'room03',
         roomId: data.detail.id,
@@ -87,7 +88,7 @@ class Home extends Component {
   _renderRoomItem = (roomItem, i) => {
     return (
       <div className="room-item">
-        <div style={{ width: "183px" }}>
+        <div style={{ width: "50%" }}>
           <Link to={{ pathname: `/play/${roomItem.roomId}`, state: { roomId: roomItem.roomId } }} className="room-item-name">{roomItem.roomName}</Link>
           <p className="room-item-creator">{roomItem.creatorName}</p>
           <p className="room-item-created-at">1 minute ago</p>
