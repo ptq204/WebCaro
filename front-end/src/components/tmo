@@ -1,0 +1,9 @@
+<Col xs={4} style={{ marginLeft: "10px" }}>
+										<p className="user-rank-info-username">{userInformation.username}</p>
+										<p className="user-rank-info-rank">Rank: {userInformation.rank} pts</p>
+									</Col>
+									<Col xs={1} className="user-rank-info-bagde">
+										<img style={{ height: "70%" }} src={getRankBadge(userInformation.rank)}></img>
+									</Col>
+
+                                    <img style={{ height: "70%" }} src={getRankBadge(userInformation.rank)}></img>

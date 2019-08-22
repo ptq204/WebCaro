@@ -1,8 +1,8 @@
-const createMap = (size) => {
+const createMap = (rowSize, colSize) => {
     let m = [];
-    for(let i = 0; i < size; i++) {
+    for(let i = 0; i < rowSize; i++) {
         m[i] = [];
-        for(let j = 0; j < size; j++) {
+        for(let j = 0; j < colSize; j++) {
             m[i][j] = {
                 isChoosen: false,
                 move: null,

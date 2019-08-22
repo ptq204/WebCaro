@@ -86,28 +86,28 @@ const gameLogic = function(io){
             socket.to(roomId).emit('chat', data.msg);
         });
 
-        socket.on(('disconnect'), () => {
-            socket.leave(roomId);
-            let userList = roomList[roomId].userList;
-            if (roomList[roomId].status === 0){
-                io.in('global').emit('room-close', {
-                    id: roomId
-                });
-                delete roomList[roomId];
-            } else {
-                if (roomList[roomId].status === 2){
-                    let winner = (userList.indexOf(userID) + 1) % 2;
-                    userService.updateRank(userList[winner], userID);
-                }
-                let index = userList.indexOf(userID);
-                userList.slice(index,1);
-                roomList[roomId].status = 0;
-                roomList[roomId].replay = 0;
-                roomList[roomId].start_ack = 0;
-                socket.to(roomId).emit('other-disconnect',{});
-            }
-            roomId="";  
-        });
+        // socket.on(('disconnect'), () => {
+        //     socket.leave(roomId);
+        //     let userList = roomList[roomId].userList;
+        //     if (roomList[roomId].status === 0){
+        //         io.in('global').emit('room-close', {
+        //             id: roomId
+        //         });
+        //         delete roomList[roomId];
+        //     } else {
+        //         if (roomList[roomId].status === 2){
+        //             let winner = (userList.indexOf(userID) + 1) % 2;
+        //             userService.updateRank(userList[winner], userID);
+        //         }
+        //         let index = userList.indexOf(userID);
+        //         userList.slice(index,1);
+        //         roomList[roomId].status = 0;
+        //         roomList[roomId].replay = 0;
+        //         roomList[roomId].start_ack = 0;
+        //         socket.to(roomId).emit('other-disconnect',{});
+        //     }
+        //     roomId="";  
+        // });
     });
 
 };

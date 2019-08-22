@@ -112,8 +112,31 @@ const gameRooms = [
         creatorName: "nghipt", 
         createdAt: "Thu Aug 15 2019 09:33:51",
     },
+    {
+        roomName: "Game 01",
+        roomId: "room01",
+        creator: "83df29a48249b51fe0f5c07e",  
+        creatorName: "quyenpt",
+        createdAt: "Thu Aug 15 2019 09:40:23",
+    },
+    {
+        roomName: "Game 02",
+        roomId: "room02",
+        creator: "83df29a48249b5dwqe23eo03",
+        creatorName: "nghipt", 
+        createdAt: "Thu Aug 15 2019 09:33:51",
+    },
 ]
+
+const userInformation = {
+    username: "Quyen Pham",
+    rank: 9500,
+    winCount: 45,
+    lossCount: 32
+}
+
 module.exports = {
     ranks: ranks,
-    gameRooms: gameRooms
+    gameRooms: gameRooms,
+    userInformation: userInformation
 }

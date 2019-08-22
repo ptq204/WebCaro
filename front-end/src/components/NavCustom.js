@@ -4,7 +4,7 @@ import { Navbar, Nav } from 'react-bootstrap';
 class NavCustom extends Component {
 	render() {
 		return (
-			<Navbar sticky style={{ backgroundColor: "#2C3E50", display: "flex", justifyContent: "center" }}>
+			<Navbar sticky="top" style={{ backgroundColor: "#2C3E50", display: "flex", justifyContent: "center" }}>
 				<div className="container-nav">
 					<div className="container-nav-brand">
 						<Navbar.Brand style={{ color: "#18BC9C", fontWeight: "bold" }} href="/">Caro provip 123</Navbar.Brand>
