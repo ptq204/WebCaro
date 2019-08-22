@@ -82,9 +82,9 @@ const gameLogic = function(io){
             roomId = data.roomId;
             socket.join(roomId);
 
-            console.log(`${data.user} has joined room ${data.roomId}`);
+            console.log(`${socket.id} has joined room ${data.roomId}`);
 
-            roomList[roomId].userList.push(data.user);
+            roomList[roomId].userList.push(socket.id);
             roomList[roomId].status = 1;
 
             io.in(roomId).emit('start-game', {});
@@ -95,6 +95,7 @@ const gameLogic = function(io){
     
         socket.on('game-ack', () => {
             roomList[roomId].start_ack++;
+            console.log(roomList[roomId].start_ack);
             if (roomList[roomId].start_ack === 2){
                 roomList[roomId].status = 2;
                 roomList[roomId].currTurn = Math.floor((Math.random() * 2));

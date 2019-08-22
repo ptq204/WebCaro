@@ -6,7 +6,7 @@ import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
-import { changeRoomList, getUserInfo } from '../actions/actions';
+import { changeRoomList, getUserInfo, markCurrentRoom } from '../actions/actions';
 import { SERVER_URL } from '../config/config';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
@@ -14,14 +14,16 @@ import { Redirect } from 'react-router-dom';
 const mapStateToProps = state => {
   return {
     roomList: state.changeRoomList.roomList,
-    userInfo: state.getUserInfo.user
+    userInfo: state.getUserInfo.user,
+    currRoom: state.markCurrentRoom.roomId
   }
 }
 
 const mapDispatchToProps = (disPatch) => {
   return {
     changeRoomList: roomList => disPatch(changeRoomList(roomList)),
-    getUserInfo: user => disPatch(getUserInfo(user))
+    getUserInfo: user => disPatch(getUserInfo(user)),
+    markCurrentRoom: roomId => disPatch(markCurrentRoom(roomId))
   }
 }
 
@@ -42,11 +44,18 @@ class ConnectedHome extends Component {
   componentDidMount() {
     this.socket.on('new-room', (data) => {
       let newRoom = {
-        roomId: data.id,
-        roomName: 'room03',
-        creatorName: 'ptquyen'
+        id: data.id,
+        creatorName: data.creator.username,
+        name: data.name,
+        createdAt: data.createdAt
       }
       this.props.changeRoomList([...this.props.roomList, newRoom])
+    });
+
+    this.socket.on('room-created', (data) => {
+      this.props.markCurrentRoom(data.id);
+      console.log(this.props.currRoom);
+      this.props.history.push('/play');
     });
   }
 
@@ -108,12 +117,12 @@ class ConnectedHome extends Component {
     return (
       <div className="room-item">
         <div style={{ width: "50%" }}>
-          <Link to={{ pathname: `/play`, state: { roomId: roomItem.roomId } }} className="room-item-name">{roomItem.roomName}</Link>
+          <Link to={{ pathname: `/play`, state: { roomId: roomItem.id } }} className="room-item-name">{roomItem.name}</Link>
           <p className="room-item-creator">{roomItem.creatorName}</p>
-          <p className="room-item-created-at">1 minute ago</p>
+          <p className="room-item-created-at">{ roomItem.createdAt }</p>
         </div>
         <div className="room-item-join-button">
-          <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>Join</Button>
+          <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C"}} onClick={() => this._joinRoom(roomItem.id)}>Join</Button>
         </div>
       </div>
     );
@@ -123,7 +132,6 @@ class ConnectedHome extends Component {
   _createNewGameRoom = () => {
     var roomName = 'room03';
     this.socket.emit('create-room', {'roomName': roomName});
-    this.props.history.push('/play');
   }
 
   _queryUserInformation  = () => {
@@ -145,6 +153,12 @@ class ConnectedHome extends Component {
     }).catch(err => {
       console.log(err);
     });
+  }
+
+  _joinRoom = (roomId) => {
+    this.props.markCurrentRoom(roomId);
+    this.socket.emit('join', {'roomId': roomId});
+    this.props.history.push('/play');
   }
 }
 

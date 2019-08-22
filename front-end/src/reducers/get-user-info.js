@@ -8,7 +8,7 @@ const initialState = {
 }
 
 const userReducer = (state = initialState, action) => {
-    if(action.type == 'GET_USER_INFO') {
+    if(action.type === 'GET_USER_INFO') {
         return Object.assign({}, state, {
             user: action.payload
         });
