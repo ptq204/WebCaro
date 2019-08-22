@@ -5,12 +5,11 @@ const jwt = require('jsonwebtoken');
 
 const gameLogic = function(io){
     let roomId = "";
-    let userID = "";
     io.use(function(socket, next){
         if (socket.handshake.query && socket.handshake.query.token){
           jwt.verify(socket.handshake.query.token, secret, function(err, decoded) {
             if(err) return next(new Error('Authentication error'));
-            socket.decoded = decoded;
+            socket.id = decoded.id;
             next();
           });
         } else {
@@ -22,25 +21,24 @@ const gameLogic = function(io){
         socket.join('global');
         console.log(socket.decoded);
         socket.on('create-room', (data) => {
-            socket.join(data.user);
-            roomId = data.user;
-            userId = data.user;
+            socket.join(socket.id);
+            roomId = socket.id;
             let newRoom ={
-                userList: [data.user],
+                userList: [socket.id],
                 currTurn: 0,
                 status : 0,
                 replay: 0,
                 start_ack: 0
             };
-            roomList[data.user] = newRoom;
+            roomList[socket.id] = newRoom;
+            console.log(roomList);
             socket.to('global').emit('new-room', {
-                id: data.user,
+                id: socket.id,
                 detail: newRoom
             });
         });
         socket.on('join', (data) => {
             roomId = data.roomId;
-            userId = data.user;
             socket.join(roomId);
 
             console.log(`${data.user} has joined room ${data.roomId}`);
@@ -109,10 +107,10 @@ const gameLogic = function(io){
             //     delete roomList[roomId];
             // } else {
             //     if (roomList[roomId].status === 2){
-            //         let winner = (userList.indexOf(userID) + 1) % 2;
-            //         userService.updateRank(userList[winner], userID);
+            //         let winner = (userList.indexOf(socket.id) + 1) % 2;
+            //         userService.updateRank(userList[winner], socket.id);
             //     }
-            //     let index = userList.indexOf(userID);
+            //     let index = userList.indexOf(socket.id);
             //     userList.slice(index,1);
             //     roomList[roomId].status = 0;
             //     roomList[roomId].replay = 0;
