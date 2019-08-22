@@ -53,13 +53,13 @@ module.exports = {
             }
         }); 
     },
-    getGameHistory: (inUser, callback)  => {
-        UserDAO.findOne({username: inUser.username}, (err,user) => {
+    getGameHistory: (usrId, callback)  => {
+        UserDAO.findOne({id: usrId}, (err,user) => {
            if (err) return handleError(err);
            if (!user){
                callback("Invalid");
            } else {
-               GameDAO.find({players: inUser.username})
+               GameDAO.findOne({players: usrId})
                    .populate('players')
                    .populate('winner')
                    .exec( (err, games) => {
@@ -70,21 +70,40 @@ module.exports = {
         });
     },
     updateRank: (winnerId, loserId) => {
-        let earning = 100;
-        let losing = 100 * -1;
+
         Promise.all([
-            UserDAO.findByIdAndUpdate(winnerId, {$inc: {rank: earning, win: 1}}),
-            UserDAO.findByIdAndUpdate(loserId, {$inc: {rank: losing, loss: 1}})
+            UserDAO.findById(winnerId),
+            UserDAO.findById(loserId)
         ]).then(([winner, loser])=>{
             console.log(winner,loser);
+            let p1 = 1.0 * 1.0 / (1 + 1.0 * math.pow(10, 1.0 * (loser.rank - winner.rank) / 400)); 
+            let p2 = 1.0 * 1.0 / (1 + 1.0 * math.pow(10, 1.0 * (winner.rank - loser.rank) / 400));
+            let K = 100;
+            winner.rank = winner.rank + math.floor(K*(1-p1));
+            loser.rank = loser.rank + math.floor(K*(0-p2));
+
+            Promise.all([
+                winner.save(),
+                loser.save()
+            ]).then(([winner,loser]) => {
+                console.log(winner,loser);
+            })
+            .catch();
+
         }).catch((err) => {
             console.log('Error: ', err);
         });
     },
     getId: (username, callback) => {
-        UserDAO.findOne({username:username}, (err,user) => {
+        UserDAO.findOne({username:username},'id', (err,user) => {
             if (err) return handleError(err);
-            callback(user.id);
+            callback(user);
+        });
+    },
+    getUser: (userId, callback) => {
+        UserDAO.findById(userId, (err,user) => {
+            if (err) return handleError(err);
+            callback(user);
         });
     }
 };

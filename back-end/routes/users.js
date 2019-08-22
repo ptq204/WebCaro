@@ -13,9 +13,21 @@ router.get("/history", (req,res) => {
       res.json(params);
     }
   };
-  user = {};
-  user.username = req.body.usrId;
-  userService.getGameHistory (usrId, callback)
+  userService.getGameHistory (req.usrId, callback);
+});
+
+router.get("/info", (req,res) => {
+  let callback = (params) => {
+    console.log(params);
+    res.json({
+      username: params.username,
+      win: params.win,
+      loss: params.loss,
+      rank: params.rank
+    });
+  };
+  console.log(req.body.usrId);
+  userService.getUser(req.body.usrId, callback);
 });
 
 module.exports = router;

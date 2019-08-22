@@ -5,6 +5,7 @@ var userSchema = new mongoose.Schema({
     password: String,
     win: Number,
     loss: Number,
+    rank: Number,
 });
 
 userSchema.pre('save', function(next){

@@ -57,14 +57,14 @@ app.use((req,res,next) => {
       status: 1,
     });
   } else {
-    let token = req.authorization.split(" ");
+    let token = req.headers.authorization.split(" ");
     jwt.verify(token[1], secret, (err, decoded) => {
       if (err){
          res.json({
            status: 1
          });
       } else {
-        req.body.usrId = decoded;
+        req.body.usrId = decoded.id;
         next();
       }
     });
