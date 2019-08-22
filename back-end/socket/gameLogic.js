@@ -1,6 +1,7 @@
 var roomList = [];
 const userService = require('../service/UserService');
 const secret="pGctNMl4LL4bEQSwCdIzdg";
+const jwt = require('jsonwebtoken');
 
 const gameLogic = function(io){
     let roomId = "";
@@ -19,6 +20,7 @@ const gameLogic = function(io){
     .on('connection', (socket) => {
         console.log('New user connected');
         socket.join('global');
+        console.log(socket.decoded);
         socket.on('create-room', (data) => {
             socket.join(data.user);
             roomId = data.user;
@@ -35,7 +37,6 @@ const gameLogic = function(io){
                 id: data.user,
                 detail: newRoom
             });
-
         });
         socket.on('join', (data) => {
             roomId = data.roomId;
