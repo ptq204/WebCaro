@@ -7,8 +7,9 @@ import NavCustom from './NavCustom';
 import { Container, Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
-import { markCurrentRoom, markGameStart, updateBoardSate, markTurn, markTurnNum } from '../actions/actions';
+import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum } from '../actions/actions';
 import { connect } from 'react-redux';
+import getUser from '../helper/getUser';
 
 const mapStateToProps = state => {
 	return {
@@ -23,7 +24,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (disPatch) => {
 	return {
 		markGameStart: () => disPatch(markGameStart()),
-		updateBoard: board => disPatch(updateBoard(board)),
+		updateBoard: board => disPatch(updateBoardState(board)),
 		markTurn: turnMark => disPatch(markTurn(turnMark)),
 		markTurnNum: turnNum => disPatch(markTurnNum(turnNum))
 	}
@@ -39,8 +40,13 @@ class BoardContainer extends Component {
 		// 	currTurn: null
 		// }
 		this.roomId = this.props.roomId;
+		let data = JSON.parse(getUser(localStorage.getItem('token')));
+		this.user = data.id;
+		console.log(data.id);
 
-		this.socket = io(SERVER_URL);
+		this.socket = io(SERVER_URL, {
+			query: {token: localStorage.getItem('token')}
+		});
 
 		this.socket.on('start-game', (data) => {
 			console.log('Emit game ack');
@@ -53,8 +59,9 @@ class BoardContainer extends Component {
 
 		this.socket.on('turn', (data) => {
 			let turnMark = false;
+			console.log(data);
 			if (data.updatedBoard) {
-				this.props.updateBoard(data.updateBoard);
+				this.props.updateBoard(data.updatedBoard);
 			}
 			if (this.user === data.user) {
 				turnMark = true;
@@ -146,7 +153,7 @@ class BoardContainer extends Component {
 
 	_handleCellClick = (m, i, j) => {
 		if (this.props.isGameStarted && this.props.isYourTurn && m[i][j].move === null) {
-			let move = (this.state.currTurn % 2 == 0) ? 'X' : 'O';
+			let move = (this.props.currTurn % 2 == 0) ? 'X' : 'O';
 			var updatedBoard = updateBoard(m, i, j, move);
 			// this.setState({
 			// 	board: updatedBoard
