@@ -62,6 +62,9 @@ const gameLogic = function(io){
                 start_ack: 0
             };
             roomList[socket.id] = newRoom;
+            socket.emit("room-created", {
+                id: socket.id
+            });
             console.log(roomList);
             let date = getCurrentDate();
             let callback = (params) => {
@@ -136,7 +139,7 @@ const gameLogic = function(io){
         });
         
         socket.on('leave-room', () => {
-            leaveRoom(socket);
+             (socket);
         });
 
         socket.on(('disconnect'), (reason) => {
