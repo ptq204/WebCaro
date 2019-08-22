@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { changeRoomList, getUserInfo } from '../actions/actions';
 import { SERVER_URL } from '../config/config';
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 const mapStateToProps = state => {
   return {
@@ -107,7 +108,7 @@ class ConnectedHome extends Component {
     return (
       <div className="room-item">
         <div style={{ width: "50%" }}>
-          <Link to={{ pathname: `/play/${roomItem.roomId}`, state: { roomId: roomItem.roomId } }} className="room-item-name">{roomItem.roomName}</Link>
+          <Link to={{ pathname: `/play`, state: { roomId: roomItem.roomId } }} className="room-item-name">{roomItem.roomName}</Link>
           <p className="room-item-creator">{roomItem.creatorName}</p>
           <p className="room-item-created-at">1 minute ago</p>
         </div>
@@ -122,12 +123,13 @@ class ConnectedHome extends Component {
   _createNewGameRoom = () => {
     var roomName = 'room03';
     this.socket.emit('create-room', {'roomName': roomName});
+    this.props.history.push('/play');
   }
 
   _queryUserInformation  = () => {
     axios({
       headers: {
-        Authentication: `Bearer ${localStorage.getItem('token')}`
+        authorization: `Bearer ${localStorage.getItem('token')}`
       },
       method: 'GET',
       url: `${SERVER_URL}/users/info`
