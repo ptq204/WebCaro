@@ -4,30 +4,47 @@ import { Link } from 'react-router-dom';
 import NavCustom from './NavCustom';
 import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
+import io from 'socket.io-client';
+import { changeRoomList } from '../actions/actions';
+import { connect } from 'react-redux';
 
-class Home extends Component {
+const mapRoomListStateToProps = state => {
+	return {roomList: state.changeRoomList.roomList}
+}
+
+const mapDispatchRoomListToProps = (disPatch) => {
+  return {
+    changeRoomList: roomList => disPatch(changeRoomList(roomList))
+  }
+}
+
+
+class ConnectedHome extends Component {
 
   constructor(props) {
     super(props);
-    this.socket = io('http://10.200.232.42:4000');
+    this.socket = io('http://192.168.122.1:4000', {
+      query: {token: localStorage.getItem('token')}
+    });
     this.state = {
       gameRooms: gameRooms
     }
+    localStorage.setItem('token', )
   }
 
   componentDidMount() {
-    this.socket.on('new-room', (data) => {
-      let newRoom = {
-        roomName: 'room03',
-        roomId: data.detail.id,
-        creator: data.detail.id,
-        creatorName: data.detail.id,
-        createdAt: "Thu Aug 15 2019 09:40:23",
-      }
-      this.setState({
-        gameRooms: [...gameRooms, newRoom]
-      });
-    });
+    // this.socket.on('new-room', (data) => {
+    //   let newRoom = {
+    //     roomName: 'room03',
+    //     roomId: data.detail.id,
+    //     creator: data.detail.id,
+    //     creatorName: data.detail.id,
+    //     createdAt: "Thu Aug 15 2019 09:40:23",
+    //   }
+    //   this.setState({
+    //     gameRooms: [...gameRooms, newRoom]
+    //   });
+    // });
   }
 
   render() {
@@ -38,7 +55,7 @@ class Home extends Component {
           <div style={{ display: "flex", justifyContent: "center" }}>
             <div className="home-create-join-button-container">
               <Button style={{ marginRight: "20px", height: "40%" }} onClick={this._createNewGameRoom}>Create room</Button>
-              <Button style={{ height: "40%" }}>Join random</Button>
+              <Button style={{ height: "40%" }} onClick={() => this.props.changeRoomList(gameRooms)}>Join random</Button>
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -46,7 +63,7 @@ class Home extends Component {
               <Col md={8.5} className="room-list-container-scroll">
                 <div className="room-list">
                   {
-                    this.state.gameRooms.map((roomItem, index) => {
+                    this.props.roomList.map((roomItem, index) => {
                       return this._renderRoomItem(roomItem, index);
                     })
                   }
@@ -87,7 +104,7 @@ class Home extends Component {
   _renderRoomItem = (roomItem, i) => {
     return (
       <div className="room-item">
-        <div style={{ width: "183px" }}>
+        <div style={{ width: "50%" }}>
           <Link to={{ pathname: `/play/${roomItem.roomId}`, state: { roomId: roomItem.roomId } }} className="room-item-name">{roomItem.roomName}</Link>
           <p className="room-item-creator">{roomItem.creatorName}</p>
           <p className="room-item-created-at">1 minute ago</p>
@@ -99,10 +116,13 @@ class Home extends Component {
     );
   }
 
+  // Create new room ('create-room', {roomName: String})
   _createNewGameRoom = () => {
     var roomName = 'room03';
-    this.socket.emit('create-room', {'roomName': roomName, 'user': 'ptquyen'});
+    this.socket.emit('create-room', {'roomName': roomName});
   }
 }
+
+const Home = connect(mapRoomListStateToProps, mapDispatchRoomListToProps)(ConnectedHome);
 
 export default Home;

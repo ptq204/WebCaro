@@ -146,7 +146,7 @@ body, html {
 
 .room-item-join-button {
   display: flex;
-  width: 183px;
+  width: 50%;
   justify-content: flex-end;
   align-items: center;
 }
