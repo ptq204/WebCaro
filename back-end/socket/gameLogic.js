@@ -140,7 +140,7 @@ const gameLogic = function(io){
         });
 
         socket.on(('disconnect'), (reason) => {
-            leaveRoom(socket);
+            //leaveRoom(socket);
             console.log("Disconnenct because " + reason); 
         });
     });
