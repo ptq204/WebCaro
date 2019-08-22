@@ -35,7 +35,7 @@ class ConnectedHome extends Component {
   }
 
   componentWillMount() {
-    
+    this._queryUserInformation();
   }
 
   componentDidMount() {
@@ -136,6 +136,7 @@ class ConnectedHome extends Component {
         const resInfo = JSON.stringify(res.data);
         const data = JSON.parse(resInfo);
         if(data) {
+          console.log(data);
           this.props.getUserInfo(data);
         }
       }

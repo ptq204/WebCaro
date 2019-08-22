@@ -1,5 +1,10 @@
 const initialState = {
-    user: null
+    user: {
+        username: '',
+        win: 0,
+        loss: 0,
+        rank: 0
+    }
 }
 
 const userReducer = (state = initialState, action) => {
