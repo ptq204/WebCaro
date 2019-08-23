@@ -109,17 +109,18 @@ module.exports = {
         });
     },
     getUser: (userId, callback) => {
-        user = client.get('user:'+userId);
-        if (user != null){
-            console.log(user);
-            callback(user);
-        } else {
-            UserDAO.findById(userId, (err,user) => {
-                if (err) return handleError(err);
-                client.set('user:'+userId, user);
-                callback(user);
-            });
-        }  
+        client.get('user:'+userId, (err, reply) => {
+            if (err) return handleError(err);
+            if (reply != null){
+                callback(reply);
+            } else {
+                UserDAO.findById(userId, (err,user) => {
+                    if (err) return handleError(err);
+                    client.set('user:'+userId, user);
+                    callback(user);
+                });
+            }  
+        });
     },
     setRedisClient: (inClient) => {
         client = inClient;
