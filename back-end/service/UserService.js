@@ -112,6 +112,7 @@ module.exports = {
         client.get('user:'+userId, (err, reply) => {
             if (err) return handleError(err);
             if (reply != null){
+                reply = JSON.parse(reply);
                 callback(reply);
             } else {
                 UserDAO.findById(userId, (err,user) => {
