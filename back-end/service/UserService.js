@@ -33,7 +33,7 @@ module.exports = {
                 });
             }     
         });
-        
+
     },
     authenticateUser: (inUser , callback) => {
         UserDAO.findOne({username: inUser.username}, (err, user) => {
@@ -87,7 +87,9 @@ module.exports = {
             winner.win += 1;
             loser.loss += 1;
 
-
+            client.zadd('ranking', winner.rank, winner.username, loser.rank, loser.username);
+            client.set('user:'+winner.id,winner);
+            client.set('user:'+loser.id,loser);
             Promise.all([
                 winner.save(),
                 loser.save()
@@ -107,10 +109,16 @@ module.exports = {
         });
     },
     getUser: (userId, callback) => {
-        UserDAO.findById(userId, (err,user) => {
-            if (err) return handleError(err);
+        user = client.get('user:'+userId);
+        if (user != null){
             callback(user);
-        });
+        } else {
+            UserDAO.findById(userId, (err,user) => {
+                if (err) return handleError(err);
+                client.set('user:'+userId, user);
+                callback(user);
+            });
+        }  
     },
     setRedisClient: (inClient) => {
         client = inClient;

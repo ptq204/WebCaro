@@ -8,13 +8,15 @@ const mongoose = require( 'mongoose' );
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 const cors = require('cors');
 const redis = require('redis');
-// const client = redis.createClient()
+const redisURL = "redis://redis-15669.c81.us-east-1-2.ec2.cloud.redislabs.com:15669?password=nLMFKnlfqGbsuhHn4bdKPOyGpTfZiYrE";
+const client = redis.createClient(redisURL);
 const userService = require('./service/UserService');
+const rankingService = require('./service/RankingService');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const unguardRouter = require('./routes/unguard');
-
+const rankRoute = require('./routes/ranking');
 
 var dbURI = "mongodb+srv://nghipt:skN1rHeACPFM2dKw@carogame-rcp4i.mongodb.net/test?retryWrites=true&w=majority"; 
 mongoose.connect(dbURI, {useNewUrlParser: true}); 
@@ -40,8 +42,18 @@ process.on('SIGINT', function() {
   }); 
 }); 
 
+client.on('error', (err) => {
+  console.log("Redis error " + err);
+})
 
-const redisURL = "redis://redis-15669.c81.us-east-1-2.ec2.cloud.redislabs.com:15669?password=nLMFKnlfqGbsuhHn4bdKPOyGpTfZiYrE";
+client.on('ready', () => {
+  console.log("redis ready");
+  userService.setRedisClient(client);
+  rankingService.setRedisClient(client);
+});
+
+
+
 
 var app = express();
 
@@ -77,7 +89,7 @@ app.use((req,res,next) => {
     });
   }
 });
-
+app.use(rankRoute);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
