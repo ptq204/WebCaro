@@ -5,6 +5,7 @@ import io from 'socket.io-client';
 import uuidv4 from 'uuid/v4';
 import NavCustom from './NavCustom';
 import { Container, Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
+import { Card } from 'semantic-ui-react';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
 import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum } from '../actions/actions';
@@ -45,7 +46,7 @@ class BoardContainer extends Component {
 		console.log(data.id);
 
 		this.socket = io(SERVER_URL, {
-			query: {token: localStorage.getItem('token')}
+			query: { token: localStorage.getItem('token') }
 		});
 
 		this.socket.on('start-game', (data) => {
@@ -87,18 +88,30 @@ class BoardContainer extends Component {
 				<NavCustom></NavCustom>
 				<div className="background-color-effect-dark">
 					<div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-						<div className="play-game-container">
+						<Card className="play-game-container" style={{ width: "140vmin" }}>
 							<div className="opponent-time-progress-container">
 								<div id="play-user-info" className="play-user-info">
 									<img src={getRankBadge(9282)}></img>
-									<p className="play-game-username">Quyen PT</p>
+									<div>
+										<p className="play-game-username">Quyen PT</p>
+										<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+											<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+											<p className="play-game-userrank">9282</p>
+										</div>
+									</div>
 								</div>
 								<div className="match-ratio">
-									<p style={{ color: "white", fontSize: "200%", marginRight: "10%" }}>0</p>
-									<p style={{ color: "white", fontSize: "200%" }}>0</p>
+									<p style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
+									<p style={{ color: "#383834", fontSize: "200%" }}>0</p>
 								</div>
 								<div id="play-opponent-info" className="play-opponent-info">
-									<p className="play-game-username">Quyen PT</p>
+									<div>
+										<p className="play-game-username">Quyen PT</p>
+										<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+											<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+											<p className="play-game-userrank">9282</p>
+										</div>
+									</div>
 									<img src={getRankBadge(9282)}></img>
 								</div>
 							</div>
@@ -106,7 +119,7 @@ class BoardContainer extends Component {
 								<Col className="board" style={{ padding: "0", border: "0" }}>
 									{this._renderBoard(this.props.board)}
 								</Col>
-								<Col className="chat-container">
+								<Col className="chat-container" style={{ padding: 0 }}>
 									<ProgressBar style={{ width: "100%" }} animated now={45} />
 									<div className="chat-layout-container">
 										<div className="chat-layout">
@@ -126,7 +139,7 @@ class BoardContainer extends Component {
 									</div>
 								</Col>
 							</div>
-						</div>
+						</Card>
 					</div>
 				</div>
 			</div>
