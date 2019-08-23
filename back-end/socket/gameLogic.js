@@ -70,9 +70,13 @@ const gameLogic = function(io){
             let callback = (params) => {
                 socket.to('global').emit('new-room', {
                     id: socket.id,
-                    creator: params,
+                    creator: {
+                        username: params.username,
+                        rank: params.rank
+                    },
                     name: data.roomName,
-                    createdAt: date
+                    createdAt: date,
+                    status: 0
                 });
             };
             userService.getUser(socket.id, callback);
@@ -89,12 +93,19 @@ const gameLogic = function(io){
 
             console.log(roomList[roomId].userList);
 
-            setTimeout(() => {
-                io.in(roomId).emit('start-game', {'message': 'GUI REQUEST ACK DI'});
-            }, 1000);
-            socket.to('global').emit('room-status-change', {
-                id: roomId
-            });
+            let callback = (joinedUser)=>{
+                io.in(roomId).emit('start-game', {joining: {
+                    username: joinedUser.username,
+                    rank: joinedUser.rank
+                }});
+                socket.to('global').emit('room-status-change', {
+                    id: roomId
+                });
+            };
+            
+            userService.getUser(socket.id, callback);
+            
+            
         }); 
     
         socket.on('game-ack', () => {
