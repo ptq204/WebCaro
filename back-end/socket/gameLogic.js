@@ -97,9 +97,11 @@ const gameLogic = function(io){
                 roomList[roomId].status = 2;
                 roomList[roomId].currTurn = Math.floor((Math.random() * 2));
                 let currUser = roomList[roomId].userList[roomList[roomId].currTurn % 2];
-                io.in(roomId).emit('turn', {user: currUser, currTurn: roomList[roomId].currTurn});
-                roomList[roomId].currTurn++;
                 io.in(roomId).emit('start-playing', {});
+                setTimeout(() => {
+                    io.in(roomId).emit('turn', {user: currUser, currTurn: roomList[roomId].currTurn});
+                    roomList[roomId].currTurn++;
+                },1000);
             }
         });
 
@@ -137,7 +139,7 @@ const gameLogic = function(io){
         });
         
         socket.on('leave-room', () => {
-             (socket);
+             leaveRoom(socket);
         });
 
         socket.on(('disconnect'), (reason) => {
