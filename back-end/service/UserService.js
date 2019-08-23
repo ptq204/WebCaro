@@ -88,8 +88,18 @@ module.exports = {
             loser.loss += 1;
 
             client.zadd('ranking', winner.rank, winner.username, loser.rank, loser.username);
-            client.set('user:'+winner.id,winner);
-            client.set('user:'+loser.id,loser);
+            client.set('user:'+winner.id,{
+                username: winner.username,
+                win: winner.win,
+                loss: winner.loss,
+                rank: winner.rank
+            });
+            client.set('user:'+loser.id,{
+                username: loser.username,
+                win: loser.win,
+                loss: loser.loss,
+                rank: loser.rank
+            });
             Promise.all([
                 winner.save(),
                 loser.save()
@@ -117,7 +127,12 @@ module.exports = {
             } else {
                 UserDAO.findById(userId, (err,user) => {
                     if (err) return handleError(err);
-                    client.set('user:'+userId, user);
+                    client.set('user:'+userId, {
+                        username: user.username,
+                        win: user.win,
+                        loss: user.loss,
+                        rank: user.rank
+                    });
                     callback(user);
                 });
             }  
