@@ -19,6 +19,7 @@ router.get("/history", (req,res) => {
 router.get("/info", (req,res) => {
   let callback = (params) => {
     console.log(params);
+    console.log(typeof(params));
     body = {
       username: params.username,
       win: params.win,
