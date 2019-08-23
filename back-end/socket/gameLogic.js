@@ -116,7 +116,8 @@ const gameLogic = function(io){
             let currUser = roomList[roomId].userList[roomList[roomId].currTurn % 2];
             let msgBody = {
                 user: currUser,
-                currTurn: roomList[roomId].currTurn
+                currTurn: roomList[roomId].currTurn,
+                msgBody.updatedBoard = data.updatedBoard;
             };
 
             if (data.gameEnd === 1){
@@ -124,8 +125,7 @@ const gameLogic = function(io){
                 let winner = roomList[roomId].userList[(roomList[roomId].currTurn + 1) % 2];
                 userService.updateRank(winner,currUser);
             } else {
-                msgBody.gameEnd = 0;
-                msgBody.updatedBoard = data.updatedBoard;
+                msgBody.gameEnd = 0;   
             }
 
             io.in(roomId).emit('turn', msgBody);
@@ -146,7 +146,7 @@ const gameLogic = function(io){
         });
         
         socket.on('leave-room', () => {
-             (socket);
+             leaveRoom(socket);
         });
 
         socket.on(('disconnect'), (reason) => {
