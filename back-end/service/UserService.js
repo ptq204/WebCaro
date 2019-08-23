@@ -111,6 +111,7 @@ module.exports = {
     getUser: (userId, callback) => {
         user = client.get('user:'+userId);
         if (user != null){
+            console.log(user);
             callback(user);
         } else {
             UserDAO.findById(userId, (err,user) => {

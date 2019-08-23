@@ -43,7 +43,8 @@ class BoardContainer extends Component {
 		// 	isGameStarted: false,
 		// 	isYourTurn: false,
 		// 	currTurn: null
-		// }
+		// }'
+		this.opponent = null;
 		this.roomId = this.props.roomId;
 		let data = JSON.parse(getUser(localStorage.getItem('token')));
 		this.user = data.id;
@@ -115,13 +116,18 @@ class BoardContainer extends Component {
 										<p style={{ color: "#383834", fontSize: "200%" }}>0</p>
 									</div>
 									<div id="play-opponent-info" className="play-opponent-info">
-										<div>
-											<p className="play-game-username">Quyen PT</p>
-											<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-												<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-												<p className="play-game-userrank">9282</p>
+										{
+											(this.opponent !== null) ? 
+											<div>
+												<p className="play-game-username">Quyen PT</p>
+												<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+													<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+													<p className="play-game-userrank">9282</p>
+												</div>
 											</div>
-										</div>
+											:
+											<p>Waiting</p>
+										}
 										<img style={{height: "80%"}} src={getRankBadge(9282)}></img>
 									</div>
 								</div>
