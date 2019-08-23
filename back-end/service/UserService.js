@@ -79,11 +79,14 @@ module.exports = {
             UserDAO.findById(loserId)
         ]).then(([winner, loser])=>{
             console.log(winner,loser);
-            let p1 = 1.0 * 1.0 / (1 + 1.0 * math.pow(10, 1.0 * (loser.rank - winner.rank) / 400)); 
-            let p2 = 1.0 * 1.0 / (1 + 1.0 * math.pow(10, 1.0 * (winner.rank - loser.rank) / 400));
+            let p1 = 1.0 * 1.0 / (1 + 1.0 * Math.pow(10, 1.0 * (loser.rank - winner.rank) / 4000)); 
+            let p2 = 1.0 * 1.0 / (1 + 1.0 * Math.pow(10, 1.0 * (winner.rank - loser.rank) / 4000));
             let K = 100;
-            winner.rank = winner.rank + math.floor(K*(1-p1));
-            loser.rank = loser.rank + math.floor(K*(0-p2));
+            winner.rank = winner.rank + Math.floor(K*(1-p1));
+            loser.rank = loser.rank + Math.floor(K*(0-p2));
+            winner.win += 1;
+            loser.loss += 1;
+
 
             Promise.all([
                 winner.save(),

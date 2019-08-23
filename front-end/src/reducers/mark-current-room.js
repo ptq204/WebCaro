@@ -5,7 +5,8 @@ const initialState = {
     isGameStarted: false,
     board: null,
     isYourTurn: false,
-	currTurn: -1
+    currTurn: -1,
+    isGameEnd: false
 }
 
 const currRoomReducer = (state = initialState, action) => {
@@ -33,6 +34,11 @@ const currRoomReducer = (state = initialState, action) => {
     else if(action.type === 'MARK_TURN_NUM') {
         return Object.assign({} , state, {
             currTurn: action.payload
+        });
+    }
+    else if(action.type === 'MARK_GAME_END') {
+        return Object.assign({} , state, {
+            isGameEnd: action.payload
         });
     }
     return state;
