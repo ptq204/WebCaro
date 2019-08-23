@@ -1,6 +1,7 @@
 var roomList = [];
 const userService = require('../service/UserService');
 const secret="pGctNMl4LL4bEQSwCdIzdg";
+const jwt = require('jsonwebtoken');
 
 const getCurrentDate = () => {
     let today = new Date();
@@ -49,6 +50,7 @@ const gameLogic = function(io){
     .on('connection', (socket) => {
         console.log('New user connected');
         socket.join('global');
+        console.log(socket.decoded);
         socket.on('create-room', (data) => {
             socket.join(socket.id);
             roomId = socket.id;
@@ -80,12 +82,16 @@ const gameLogic = function(io){
             roomId = data.roomId;
             socket.join(roomId);
 
-            console.log(`${data.user} has joined room ${data.roomId}`);
+            console.log(`${socket.id} has joined room ${data.roomId}`);
 
-            roomList[roomId].userList.push(data.user);
+            roomList[roomId].userList.push(socket.id);
             roomList[roomId].status = 1;
 
-            io.in(roomId).emit('start-game', {});
+            console.log(roomList[roomId].userList);
+
+            setTimeout(() => {
+                io.in(roomId).emit('start-game', {'message': 'GUI REQUEST ACK DI'});
+            }, 1000);
             socket.to('global').emit('room-status-change', {
                 id: roomId
             });
@@ -93,15 +99,16 @@ const gameLogic = function(io){
     
         socket.on('game-ack', () => {
             roomList[roomId].start_ack++;
+            console.log(roomList[roomId].start_ack);
             if (roomList[roomId].start_ack === 2){
                 roomList[roomId].status = 2;
                 roomList[roomId].currTurn = Math.floor((Math.random() * 2));
                 let currUser = roomList[roomId].userList[roomList[roomId].currTurn % 2];
-                io.in(roomId).emit('start-playing', {});
+                io.in(roomId).emit('start-playing', {'message': 'PLAY DI'});
                 setTimeout(() => {
                     io.in(roomId).emit('turn', {user: currUser, currTurn: roomList[roomId].currTurn});
                     roomList[roomId].currTurn++;
-                },1000);
+                }, 2000);
             }
         });
 
@@ -109,7 +116,8 @@ const gameLogic = function(io){
             let currUser = roomList[roomId].userList[roomList[roomId].currTurn % 2];
             let msgBody = {
                 user: currUser,
-                currTurn: roomList[roomId].currTurn
+                currTurn: roomList[roomId].currTurn,
+                msgBody.updatedBoard = data.updatedBoard;
             };
 
             if (data.gameEnd === 1){
@@ -117,8 +125,7 @@ const gameLogic = function(io){
                 let winner = roomList[roomId].userList[(roomList[roomId].currTurn + 1) % 2];
                 userService.updateRank(winner,currUser);
             } else {
-                msgBody.gameEnd = 0;
-                msgBody.updatedBoard = data.updatedBoard;
+                msgBody.gameEnd = 0;   
             }
 
             io.in(roomId).emit('turn', msgBody);
@@ -143,7 +150,7 @@ const gameLogic = function(io){
         });
 
         socket.on(('disconnect'), (reason) => {
-            leaveRoom(socket);
+            //leaveRoom(socket);
             console.log("Disconnenct because " + reason); 
         });
     });

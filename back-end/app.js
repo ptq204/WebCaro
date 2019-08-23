@@ -7,7 +7,9 @@ const jwt = require('jsonwebtoken');
 const mongoose = require( 'mongoose' ); 
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 const cors = require('cors');
-
+const redis = require('redis');
+const client = redis.createClient()
+const userService = require('/service/UserService');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -37,6 +39,9 @@ process.on('SIGINT', function() {
     process.exit(0); 
   }); 
 }); 
+
+
+const redisURL = "redis://redis-15669.c81.us-east-1-2.ec2.cloud.redislabs.com:15669?password=nLMFKnlfqGbsuhHn4bdKPOyGpTfZiYrE";
 
 var app = express();
 

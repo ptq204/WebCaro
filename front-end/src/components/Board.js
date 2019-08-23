@@ -6,33 +6,62 @@ import uuidv4 from 'uuid/v4';
 import NavCustom from './NavCustom';
 import { Container, Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
 import { getRankBadge } from '../helper/helper';
+import { SERVER_URL } from '../config/config';
+import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum } from '../actions/actions';
+import { connect } from 'react-redux';
+import getUser from '../helper/getUser';
 
-class Board extends Component {
+const mapStateToProps = state => {
+	return {
+		roomId: state.markCurrentRoom.roomId,
+		isGameStarted: state.markCurrentRoom.isGameStarted,
+		board: state.markCurrentRoom.board,
+		isYourTurn: state.markCurrentRoom.isYourTurn,
+		currTurn: state.markCurrentRoom.currTurn
+	}
+}
+
+const mapDispatchToProps = (disPatch) => {
+	return {
+		markGameStart: () => disPatch(markGameStart()),
+		updateBoard: board => disPatch(updateBoardState(board)),
+		markTurn: turnMark => disPatch(markTurn(turnMark)),
+		markTurnNum: turnNum => disPatch(markTurnNum(turnNum))
+	}
+}
+class BoardContainer extends Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {
-			board: createMap(16, 19),
-			isGameStarted: false,
-			isYourTurn: false,
-			currTurn: null
-		}
-		this.roomId = this.props.location.state.roomId;
-		this.socket = io('http://10.200.232.42:4000');
-		this.user = uuidv4();
+		// this.state = {
+		// 	board: createMap(16, 19),
+		// 	isGameStarted: false,
+		// 	isYourTurn: false,
+		// 	currTurn: null
+		// }
+		this.roomId = this.props.roomId;
+		let data = JSON.parse(getUser(localStorage.getItem('token')));
+		this.user = data.id;
+		console.log(data.id);
+
+		this.socket = io(SERVER_URL, {
+			query: {token: localStorage.getItem('token')}
+		});
 
 		this.socket.on('start-game', (data) => {
-			console.log('Game started!!!');
-			this.setState({
-				isGameStarted: true,
-			});
+			console.log('Emit game ack');
+			this.socket.emit('game-ack', {});
 		});
+
+		this.socket.on('start-playing', (data) => {
+			this.props.markGameStart();
+		})
+
 		this.socket.on('turn', (data) => {
 			let turnMark = false;
+			console.log(data);
 			if (data.updatedBoard) {
-				this.setState({
-					board: data.updatedBoard
-				});
+				this.props.updateBoard(data.updatedBoard);
 			}
 			if (this.user === data.user) {
 				turnMark = true;
@@ -41,19 +70,17 @@ class Board extends Component {
 				}, 5000);
 				console.log(this.timeOut);
 			}
-			this.setState({
-				isYourTurn: turnMark,
-				currTurn: data.currTurn
-			});
+			this.props.markTurn(turnMark);
+			this.props.markTurnNum(data.currTurn);
 		});
 		console.log("COnstructor done");
 	}
 
-	componentDidMount() {
-		this.socket.emit('join', { 'roomId': this.roomId, 'user': this.user });
-		console.log("Event emitted");
+	// componentDidMount() {
+	// 	this.socket.emit('join', { 'roomId': this.roomId, 'user': this.user });
+	// 	console.log("Event emitted");
 
-	}
+	// }
 	render() {
 		return (
 			<div className="background-img">
@@ -77,7 +104,7 @@ class Board extends Component {
 							</div>
 							<div className="board-chat-container" style={{ width: "100%", border: "0", padding: "0" }}>
 								<Col className="board" style={{ padding: "0", border: "0" }}>
-									{this._renderBoard(this.state.board)}
+									{this._renderBoard(this.props.board)}
 								</Col>
 								<Col className="chat-container">
 									<ProgressBar style={{ width: "100%" }} animated now={45} />
@@ -125,8 +152,8 @@ class Board extends Component {
 	}
 
 	_handleCellClick = (m, i, j) => {
-		if (this.state.isGameStarted && this.state.isYourTurn && m[i][j].move === null) {
-			let move = (this.state.currTurn % 2 == 0) ? 'X' : 'O';
+		if (this.props.isGameStarted && this.props.isYourTurn && m[i][j].move === null) {
+			let move = (this.props.currTurn % 2 == 0) ? 'X' : 'O';
 			var updatedBoard = updateBoard(m, i, j, move);
 			// this.setState({
 			// 	board: updatedBoard
@@ -148,4 +175,5 @@ class Board extends Component {
 	}
 }
 
+const Board = connect(mapStateToProps, mapDispatchToProps)(BoardContainer);
 export default Board;

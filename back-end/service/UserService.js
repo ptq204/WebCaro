@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const GameDAO = require('../model/GameModel');
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 
+let client;
+
+
 module.exports = {
     createUser: (user, callback) => {
         UserDAO.findOne({username: user.username}, (err,foundUser) => {
@@ -105,5 +108,8 @@ module.exports = {
             if (err) return handleError(err);
             callback(user);
         });
+    },
+    setRedisClient: (inClient) => {
+        client = inClient;
     }
 };
