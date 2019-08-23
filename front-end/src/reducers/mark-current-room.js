@@ -6,7 +6,7 @@ const initialState = {
     board: null,
     isYourTurn: false,
     currTurn: -1,
-    isGameEnd: false
+    isGameEnd: true
 }
 
 const currRoomReducer = (state = initialState, action) => {

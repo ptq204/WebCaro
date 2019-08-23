@@ -87,7 +87,7 @@ class ConnectedHome extends Component {
                     <p className="user-rank-info-username">{this.props.userInfo.username} KKK</p>
                     <p className="user-rank-info-rank">Rank: {this.props.userInfo.rank} pts</p>
                   </Col>
-                  <Col xs={2} className="userhttp://10.200.232.42:4000-rank-info-badge-container">
+                  <Col xs={2} className="user-rank-info-badge-container">
                     <img style={{ height: "90%" }} src={getRankBadge(this.props.userInfo.rank)}></img>
                   </Col>
                 </Row>
@@ -95,13 +95,13 @@ class ConnectedHome extends Component {
                   <Col xs={6} className="user-game-statistic-win-loss">
                     <div>
                       <p style={{ color: "#18BC9C", fontSize: "20px" }}>Win</p>
-                      <p style={{ color: "white", fontSize: "25px" }}>{this.props.userInfo.win}</p>
+                      <p style={{ color: "white", fontSize: "25px", textAlign: "center"}}>{this.props.userInfo.win}</p>
                     </div>
                   </Col>
                   <Col xs={6} className="user-game-statistic-win-loss">
                     <div>
                       <p style={{ color: "#F33A3A", fontSize: "20px" }}>Loss</p>
-                      <p style={{ color: "white", fontSize: "25px" }}>{this.props.userInfo.loss}</p>
+                      <p style={{ color: "white", fontSize: "25px", textAlign: "center"}}>{this.props.userInfo.loss}</p>
                     </div>
                   </Col>
                 </Row>

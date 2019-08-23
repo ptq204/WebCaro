@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import uuidv4 from 'uuid/v4';
 import NavCustom from './NavCustom';
 import { Container, Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
-import { Card } from 'semantic-ui-react';
+import { Card, Image } from 'semantic-ui-react';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
 import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd } from '../actions/actions';
@@ -19,7 +19,9 @@ const mapStateToProps = state => {
 		board: state.markCurrentRoom.board,
 		isYourTurn: state.markCurrentRoom.isYourTurn,
 		currTurn: state.markCurrentRoom.currTurn,
-		isGameEnd: state.markCurrentRoom.isGameEnd
+		isGameEnd: state.markCurrentRoom.isGameEnd,
+		username: state.getUserInfo.user.username,
+		userrank: state.getUserInfo.user.rank
 	}
 }
 
@@ -92,58 +94,75 @@ class BoardContainer extends Component {
 	render() {
 		return (
 			<div className="background-img">
-				<NavCustom></NavCustom>
 				<div className="background-color-effect-dark">
+				<NavCustom></NavCustom>
 					<div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
 						<Card className="play-game-container" style={{ width: "140vmin" }}>
 							<div className="opponent-time-progress-container">
-								<div id="play-user-info" className="play-user-info">
-									<img src={getRankBadge(9282)}></img>
-									<div>
-										<p className="play-game-username">Quyen PT</p>
-										<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-											<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-											<p className="play-game-userrank">9282</p>
+								<div style={{height: "22vmin", width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-end"}}>
+									<div id="play-user-info" className="play-user-info">
+										<img style={{height: "80%"}} src={getRankBadge(this.props.userrank)}></img>
+										<div>
+											<p className="play-game-username">{ this.props.username }</p>
+											<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+												<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+												<p className="play-game-userrank">{ this.props.userrank }</p>
+											</div>
 										</div>
 									</div>
-								</div>
-								<div className="match-ratio">
-									<p style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
-									<p style={{ color: "#383834", fontSize: "200%" }}>0</p>
-								</div>
-								<div id="play-opponent-info" className="play-opponent-info">
-									<div>
-										<p className="play-game-username">Quyen PT</p>
-										<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-											<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-											<p className="play-game-userrank">9282</p>
-										</div>
+									<div className="match-ratio">
+										<p style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
+										<p style={{ color: "#383834", fontSize: "200%" }}>0</p>
 									</div>
-									<img src={getRankBadge(9282)}></img>
+									<div id="play-opponent-info" className="play-opponent-info">
+										<div>
+											<p className="play-game-username">Quyen PT</p>
+											<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+												<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+												<p className="play-game-userrank">9282</p>
+											</div>
+										</div>
+										<img style={{height: "80%"}} src={getRankBadge(9282)}></img>
+									</div>
 								</div>
+								<ProgressBar style={{ width: "100%" }} animated now={45} />
 							</div>
-							<div className="board-chat-container" style={{ width: "100%", border: "0", padding: "0" }}>
-								<Col className="board" style={{ padding: "0", border: "0" }}>
-									{this._renderBoard(this.props.board)}
+							<div className="board-chat-container" style={{ border: "0", padding: "0" }}>
+								<Col md={6.5} className="board" style={{ padding: "0", border: "0"}}>
+									{
+										(this.props.isGameEnd) ? 
+										(
+											<div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+												<Button>Play Again</Button>
+											</div>
+										)
+										:
+										this._renderBoard(this.props.board)
+									}
 								</Col>
-								<Col className="chat-container" style={{ padding: 0 }}>
-									<ProgressBar style={{ width: "100%" }} animated now={45} />
-									<div className="chat-layout-container">
-										<div className="chat-layout">
+								<Col md = {4} className="room-name-chat-container" style={{ padding: 0 }}>
+									<Card className="room-name-chat-container-card" style={{width: "100%"}}>
+									<Image style={{maxHeight: "15vmin", width: "100%"}} src='https://react.semantic-ui.com/images/avatar/large/matthew.png' fluid />
+										<Card.Content>
+											<Card.Header>
+												Game Room
+											</Card.Header>
+										</Card.Content>
+										<div className="chat-layout-container">
+											<div className="chat-layout">
+											</div>
+											<InputGroup style={{ marginTop: "2vmin" }} className="mb-3 chat-input">
+												<FormControl
+													placeholder="Recipient's username"
+													aria-label="Recipient's username"
+													aria-describedby="basic-addon2"
+												/>
+												<InputGroup.Append>
+													<Button variant="primary">Button</Button>
+												</InputGroup.Append>
+											</InputGroup>
 										</div>
-										<InputGroup style={{ marginTop: "2vmin" }} className="mb-3">
-											<FormControl
-												placeholder="Recipient's username"
-												aria-label="Recipient's username"
-												aria-describedby="basic-addon2"
-											/>
-											<InputGroup.Append>
-												<Button variant="primary">Button</Button>
-											</InputGroup.Append>
-										</InputGroup>
-									</div>
-									<div>
-									</div>
+									</Card>
 								</Col>
 							</div>
 						</Card>
@@ -199,6 +218,7 @@ class BoardContainer extends Component {
 			// }
 			if(gameEnd) {
 				console.log('GAME END');
+				this.props.markGameEnd(true);
 			}
 			
 			// setTimeout(() => {

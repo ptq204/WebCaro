@@ -19,9 +19,6 @@ body, html {
   width: 100%;
   top: 0;
   position: fixed;
-  display: flex;
-  align-content: center;
-  overflow-y: scroll;
 }
 
 .background-color-effect-dark {
@@ -228,6 +225,7 @@ body, html {
   justify-items: center;
   width: 140vmin;
   flex-direction: column;
+  box-shadow: 5px 6px 6px 0px rgba(0,0,0,0.75);
 }
 
 .play-game-username {
@@ -246,20 +244,21 @@ body, html {
 }
 
 .opponent-time-progress-container {
-  height: 22vh;
+  height: 16vh;
   width: 100%;
   display: flex;
-  align-items: flex-end;
-  flex-direction: row;
-  background-color: rgba(255, 255, 255, 0.719);
-
+  flex-direction: column-reverse;
+  background-color: #edf2f9;
+  padding-bottom: 1vmin;
+  box-shadow: 0px 1px 6px 0px rgba(0,0,0,0.75);
 }
 
 .board-chat-container {
   display: flex;
   align-items: flex-end;
-  height: 78vh;
+  height: 84vh;
   width: 140vmin;
+  box-shadow: 5px 6px 6px 0px rgba(0,0,0,0.75);
 }
 
 .board-row {
@@ -268,7 +267,8 @@ body, html {
 }
 
 .board {
-  background-color: grey;
+  width: 110vmin;
+  height: 100%;
 }
 
 .play-user-info {
@@ -290,10 +290,14 @@ body, html {
   justify-content: center;
 }
 
-.chat-container {
+.room-name-chat-container {
   height: 100%;
+  margin: 0;
 }
 
+.room-name-chat-container-card {
+  height: 100%;
+}
 .chat-layout-container {
   width: 100%;
   height: 100%;
@@ -304,7 +308,7 @@ body, html {
 
 .chat-layout {
   background-color: #C4C4C4;
-  height: 90%;
+  height: 80%;
   width: 100%;
 }
 
