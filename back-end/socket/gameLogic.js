@@ -117,7 +117,7 @@ const gameLogic = function(io){
             let msgBody = {
                 user: currUser,
                 currTurn: roomList[roomId].currTurn,
-                msgBody.updatedBoard = data.updatedBoard;
+                updatedBoard: data.updatedBoard
             };
 
             if (data.gameEnd === 1){
@@ -128,7 +128,7 @@ const gameLogic = function(io){
                 msgBody.gameEnd = 0;   
             }
 
-            io.in(roomId).emit('turn', msgBody);
+            socket.to(roomId).emit('turn', msgBody);
             roomList[roomId].currTurn++;
         });
 
