@@ -19,12 +19,9 @@ router.get("/history", (req,res) => {
 router.get("/info", (req,res) => {
   let callback = (params) => {
     console.log(params);
-    res.json({
-      username: params.username,
-      win: params.win,
-      loss: params.loss,
-      rank: params.rank
-    });
+    res.json(
+      params
+    );
   };
   console.log(req.body.usrId);
   userService.getUser(req.body.usrId, callback);

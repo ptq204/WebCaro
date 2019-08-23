@@ -143,6 +143,7 @@ class ConnectedHome extends Component {
       url: `${SERVER_URL}/users/info`
     }).then(res => {
       if(res) {
+        console.log(res);
         const resInfo = JSON.stringify(res.data);
         const data = JSON.parse(resInfo);
         if(data) {
