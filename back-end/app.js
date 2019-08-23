@@ -8,8 +8,8 @@ const mongoose = require( 'mongoose' );
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 const cors = require('cors');
 const redis = require('redis');
-const client = redis.createClient()
-const userService = require('/service/UserService');
+// const client = redis.createClient()
+const userService = require('./service/UserService');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');

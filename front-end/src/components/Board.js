@@ -61,16 +61,17 @@ class BoardContainer extends Component {
 		})
 
 		this.socket.on('turn', (data) => {
-			let turnMark = false;
 			console.log(data);
-			if (data.updatedBoard) {
+			let turnMark = false;
+			if(data.updatedBoard) {
 				this.props.updateBoard(data.updatedBoard);
 			}
+
 			if(data.gameEnd === 1) {
 				this.props.markGameEnd(true);
-				alert('Game end!!!');
+				console.log('GAME END FROM SERVER');
 			}
-			else if (this.user === data.user) {
+			else {
 				turnMark = true;
 				// this.timeOut = setTimeout(() => {
 				// 	alert('Game end');
@@ -178,7 +179,8 @@ class BoardContainer extends Component {
 	_handleCellClick = (m, i, j) => {
 		if (this.props.isGameStarted && !this.props.isGameEnd && this.props.isYourTurn && m[i][j].move === null) {
 			let move = (this.props.currTurn % 2 == 0) ? 'X' : 'O';
-			var updatedBoard = updateBoard(m, i, j, move);
+			let updatedBoard = updateBoard(m, i, j, move);
+			//this.props.updateBoard(updatedBoard);
 			// this.setState({
 			// 	board: updatedBoard
 			// });
@@ -190,12 +192,18 @@ class BoardContainer extends Component {
 
 			this.socket.emit('play', { roomId: this.roomId, updatedBoard: updatedBoard, gameEnd: gameEnd });
 
-			setTimeout(() => {
-				if (gameEnd === 1) {
-					alert('You won');
-					this.socket.emit('repl')
-				}
-			}, 500);
+			this.props.markTurn(false);
+
+			// if (gameEnd === 1) {
+			// 	alert('You won');
+			// }
+			if(gameEnd) {
+				console.log('GAME END');
+			}
+			
+			// setTimeout(() => {
+				
+			// }, 500);
 		}
 	}
 }
