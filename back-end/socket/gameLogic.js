@@ -117,8 +117,9 @@ const gameLogic = function(io){
                 let currUser = roomList[roomId].userList[roomList[roomId].currTurn % 2];
                 io.in(roomId).emit('start-playing', {'message': 'PLAY DI'});
                 setTimeout(() => {
-                    io.in(roomId).emit('turn', {user: currUser, currTurn: roomList[roomId].currTurn});
+                    io.in(roomId).emit('turn', {user: currUser, currTurn: roomList[roomId].currTurn, firstTurn: 1});
                     roomList[roomId].currTurn++;
+                    console.log('Start at: ' + currUser);
                 }, 2000);
             }
         });

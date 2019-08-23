@@ -3,17 +3,25 @@ import { createMap } from '../algo/algo';
 const initialState = {
     roomId: null,
     isGameStarted: false,
+    creatorName: '',
+    creatorRank: 0,
     board: null,
     isYourTurn: false,
     currTurn: -1,
-    isGameEnd: true
+    isGameEnd: false
 }
 
 const currRoomReducer = (state = initialState, action) => {
     if(action.type === 'MARK_CURRENT_ROOM') {
         return Object.assign({}, state, {
-            roomId: action.payload,
-            board: createMap(16, 19)
+            roomId: action.payload.id,
+            board: createMap(16, 19),
+            isGameStarted: false,
+            creatorRank: action.payload.creatorRank,
+            creatorName: action.payload.creatorName,
+            isYourTurn: false,
+            currTurn: -1,
+            isGameEnd: false
         });
     }
     else if(action.type === 'MARK_GAME_START') {

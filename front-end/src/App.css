@@ -280,7 +280,6 @@ body, html {
 .play-opponent-info {
   display: flex;
   flex-direction: row;
-  width: 40%;
   justify-content: flex-end;
 }
 

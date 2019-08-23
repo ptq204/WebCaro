@@ -21,7 +21,9 @@ const mapStateToProps = state => {
 		currTurn: state.markCurrentRoom.currTurn,
 		isGameEnd: state.markCurrentRoom.isGameEnd,
 		username: state.getUserInfo.user.username,
-		userrank: state.getUserInfo.user.rank
+		userrank: state.getUserInfo.user.rank,
+		creatorName: state.markCurrentRoom.creatorName,
+		creatorRank: state.markCurrentRoom.creatorRank
 	}
 }
 
@@ -45,10 +47,17 @@ class BoardContainer extends Component {
 		// 	currTurn: null
 		// }'
 		this.opponent = null;
+		if(this.props.creatorName !== undefined) {
+			this.opponent = {
+				username: this.props.creatorName,
+				rank: this.props.creatorRank
+			}
+		}
+		
 		this.roomId = this.props.roomId;
-		let data = JSON.parse(getUser(localStorage.getItem('token')));
-		this.user = data.id;
-		console.log(data.id);
+		// let data = JSON.parse(getUser(localStorage.getItem('token')));
+		// this.user = data.id;
+		// console.log(data.id);
 
 		this.socket = io(SERVER_URL, {
 			query: { token: localStorage.getItem('token') }
@@ -56,6 +65,12 @@ class BoardContainer extends Component {
 
 		this.socket.on('start-game', (data) => {
 			console.log('Emit game ack');
+			if(this.opponent === null) {
+				this.opponent = {
+					username: data.joining.username,
+					rank: data.joining.rank
+				}
+			}
 			this.socket.emit('game-ack', {});
 		});
 
@@ -75,7 +90,16 @@ class BoardContainer extends Component {
 				console.log('GAME END FROM SERVER');
 			}
 			else {
-				turnMark = true;
+				if(data.firstTurn === 1) {
+					let currUser = JSON.parse(getUser(localStorage.getItem('token')));
+					if(currUser.id === data.user) {
+						turnMark = true;
+						console.log('You go first');
+					}
+				}
+				else {
+					turnMark = true;
+				}
 				// this.timeOut = setTimeout(() => {
 				// 	alert('Game end');
 				// }, 5000);
@@ -115,20 +139,22 @@ class BoardContainer extends Component {
 										<p style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
 										<p style={{ color: "#383834", fontSize: "200%" }}>0</p>
 									</div>
-									<div id="play-opponent-info" className="play-opponent-info">
+									<div style={{ width: "40%", display: "flex", justifyContent: "flex-end"}}>
 										{
-											(this.opponent !== null) ? 
-											<div>
-												<p className="play-game-username">Quyen PT</p>
-												<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-													<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-													<p className="play-game-userrank">9282</p>
+											(this.opponent !== null) ?
+											<div id="play-opponent-info" className="play-opponent-info">
+												<div>
+													<p className="play-game-username">{ this.opponent.username }</p>
+													<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+														<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+														<p className="play-game-userrank">{ this.opponent.rank }</p>
+													</div>
 												</div>
+												<img style={{height: "80%"}} src={getRankBadge(this.opponent.rank)}></img>
 											</div>
 											:
-											<p>Waiting</p>
+											<p>Waiting...</p>
 										}
-										<img style={{height: "80%"}} src={getRankBadge(9282)}></img>
 									</div>
 								</div>
 								<ProgressBar style={{ width: "100%" }} animated now={45} />
@@ -223,7 +249,7 @@ class BoardContainer extends Component {
 			// 	alert('You won');
 			// }
 			if(gameEnd) {
-				console.log('GAME END');
+				console.log('YOU WON');
 				this.props.markGameEnd(true);
 			}
 			

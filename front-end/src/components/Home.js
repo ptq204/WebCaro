@@ -23,7 +23,7 @@ const mapDispatchToProps = (disPatch) => {
   return {
     changeRoomList: roomList => disPatch(changeRoomList(roomList)),
     getUserInfo: user => disPatch(getUserInfo(user)),
-    markCurrentRoom: roomId => disPatch(markCurrentRoom(roomId))
+    markCurrentRoom: roomItem => disPatch(markCurrentRoom(roomItem))
   }
 }
 
@@ -46,6 +46,7 @@ class ConnectedHome extends Component {
       let newRoom = {
         id: data.id,
         creatorName: data.creator.username,
+        creatorRank: data.creator.rank,
         name: data.name,
         createdAt: data.createdAt
       }
@@ -53,7 +54,7 @@ class ConnectedHome extends Component {
     });
 
     this.socket.on('room-created', (data) => {
-      this.props.markCurrentRoom(data.id);
+      this.props.markCurrentRoom(data);
       console.log(this.props.currRoom);
       this.props.history.push('/play');
     });
@@ -122,7 +123,7 @@ class ConnectedHome extends Component {
           <p className="room-item-created-at">{ roomItem.createdAt }</p>
         </div>
         <div className="room-item-join-button">
-          <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C"}} onClick={() => this._joinRoom(roomItem.id)}>Join</Button>
+          <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C"}} onClick={() => this._joinRoom(roomItem)}>Join</Button>
         </div>
       </div>
     );
@@ -156,9 +157,9 @@ class ConnectedHome extends Component {
     });
   }
 
-  _joinRoom = (roomId) => {
-    this.props.markCurrentRoom(roomId);
-    this.socket.emit('join', {'roomId': roomId});
+  _joinRoom = (roomItem) => {
+    this.props.markCurrentRoom(roomItem);
+    this.socket.emit('join', {'roomId': roomItem.id});
     this.props.history.push('/play');
   }
 }
