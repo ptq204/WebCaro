@@ -1,9 +1,11 @@
 let client;
 
 module.exports = {
-    getCurrentTop: () => {
-        top100 = client.zrange('ranking',0,99,"withscores");
-        return top100;
+    getCurrentTop: (callback) => {
+        client.zrange('ranking',0,99,"withscores", (err, reply) => {
+            if (err) return handleError(err);
+            callback(reply); 
+        });
     },
     setRedisClient: (inClient) => {
         client = inClient;
