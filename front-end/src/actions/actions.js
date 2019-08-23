@@ -26,6 +26,10 @@ const markTurnNum = (payload) => {
     return {type: 'MARK_TURN_NUM', payload}
 }
 
+const markGameEnd = (payload) => {
+    return {type: 'MARK_GAME_END', payload}
+}
+
 module.exports = {
     changeRoomList: changeRoomList,
     getUserInfo: getUserInfo,
@@ -33,5 +37,6 @@ module.exports = {
     markGameStart: markGameStart,
     updateBoardState: updateBoardState,
     markTurn: markTurn,
-    markTurnNum: markTurnNum
+    markTurnNum: markTurnNum,
+    markGameEnd: markGameEnd
 }

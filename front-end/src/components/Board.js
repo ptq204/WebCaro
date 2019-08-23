@@ -8,7 +8,7 @@ import { Container, Col, ProgressBar, Button, InputGroup, FormControl } from 're
 import { Card } from 'semantic-ui-react';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
-import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum } from '../actions/actions';
+import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd } from '../actions/actions';
 import { connect } from 'react-redux';
 import getUser from '../helper/getUser';
 
@@ -18,7 +18,8 @@ const mapStateToProps = state => {
 		isGameStarted: state.markCurrentRoom.isGameStarted,
 		board: state.markCurrentRoom.board,
 		isYourTurn: state.markCurrentRoom.isYourTurn,
-		currTurn: state.markCurrentRoom.currTurn
+		currTurn: state.markCurrentRoom.currTurn,
+		isGameEnd: state.markCurrentRoom.isGameEnd
 	}
 }
 
@@ -27,7 +28,8 @@ const mapDispatchToProps = (disPatch) => {
 		markGameStart: () => disPatch(markGameStart()),
 		updateBoard: board => disPatch(updateBoardState(board)),
 		markTurn: turnMark => disPatch(markTurn(turnMark)),
-		markTurnNum: turnNum => disPatch(markTurnNum(turnNum))
+		markTurnNum: turnNum => disPatch(markTurnNum(turnNum)),
+		markGameEnd: gameEnd => disPatch(markGameEnd(gameEnd))
 	}
 }
 class BoardContainer extends Component {
@@ -64,11 +66,15 @@ class BoardContainer extends Component {
 			if (data.updatedBoard) {
 				this.props.updateBoard(data.updatedBoard);
 			}
-			if (this.user === data.user) {
+			if(data.gameEnd === 1) {
+				this.props.markGameEnd(true);
+				alert('Game end!!!');
+			}
+			else if (this.user === data.user) {
 				turnMark = true;
-				this.timeOut = setTimeout(() => {
-					alert('Game end');
-				}, 5000);
+				// this.timeOut = setTimeout(() => {
+				// 	alert('Game end');
+				// }, 5000);
 				console.log(this.timeOut);
 			}
 			this.props.markTurn(turnMark);
@@ -147,25 +153,30 @@ class BoardContainer extends Component {
 	}
 
 	_renderBoard = (m) => {
-		return m.map((datarow, i) => (
-			<div key={i} className="board-row">
-				{
-					datarow.map((cell, j) => (
-						<Cell
-							move={cell.move}
-							isChoosen={cell.isChoosen}
-							onClick={() => this._handleCellClick(m, i, j)}
-							key={i * 19 + j + 1}
-						>
-						</Cell>
-					))
-				}
-			</div>
-		));
+		if(m !== null) {
+			return m.map((datarow, i) => (
+				<div key={i} className="board-row">
+					{
+						datarow.map((cell, j) => (
+							<Cell
+								move={cell.move}
+								isChoosen={cell.isChoosen}
+								onClick={() => this._handleCellClick(m, i, j)}
+								key={i * 19 + j + 1}
+							>
+							</Cell>
+						))
+					}
+				</div>
+			));
+		}
+		else {
+			this.props.history.push('/');
+		}
 	}
 
 	_handleCellClick = (m, i, j) => {
-		if (this.props.isGameStarted && this.props.isYourTurn && m[i][j].move === null) {
+		if (this.props.isGameStarted && !this.props.isGameEnd && this.props.isYourTurn && m[i][j].move === null) {
 			let move = (this.props.currTurn % 2 == 0) ? 'X' : 'O';
 			var updatedBoard = updateBoard(m, i, j, move);
 			// this.setState({
@@ -182,6 +193,7 @@ class BoardContainer extends Component {
 			setTimeout(() => {
 				if (gameEnd === 1) {
 					alert('You won');
+					this.socket.emit('repl')
 				}
 			}, 500);
 		}
