@@ -30,6 +30,26 @@ const markGameEnd = (payload) => {
     return {type: 'MARK_GAME_END', payload}
 }
 
+const changeLoginUsername = (payload) => {
+    return {type: 'CHANGE_LOGIN_USERNAME', payload}
+}
+
+const changeLoginPassword = (payload) => {
+    return {type: 'CHANGE_LOGIN_PASSWORD', payload}
+}
+
+const setLoggedIn = (payload) => {
+    return {type: 'SET_LOGGED_IN', payload}
+}
+
+const changeRegisterUsername = (payload) => {
+    return {type: 'CHANGE_REGISTER_USERNAME', payload}
+}
+
+const changeRegisterPassword = (payload) => {
+    return {type: 'CHANGE_REGISTER_PASSWORD', payload}
+}
+
 module.exports = {
     changeRoomList: changeRoomList,
     getUserInfo: getUserInfo,
@@ -38,5 +58,10 @@ module.exports = {
     updateBoardState: updateBoardState,
     markTurn: markTurn,
     markTurnNum: markTurnNum,
-    markGameEnd: markGameEnd
+    markGameEnd: markGameEnd,
+    changeLoginUsername: changeLoginUsername,
+    changeLoginPassword: changeLoginPassword,
+    setLoggedIn: setLoggedIn,
+    changeRegisterUsername: changeRegisterUsername,
+    changeRegisterPassword: changeRegisterPassword
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { updateBoard, checkWin } from '../algo/algo';
+import { updateBoard, checkWin, createMap } from '../algo/algo';
 import Cell from './Cell';
 import io from 'socket.io-client';
 import NavCustom from './NavCustom';
@@ -89,8 +89,13 @@ class BoardContainer extends Component {
 			}
 
 			if(data.gameEnd === 1) {
-				this.props.markGameEnd(true);
-				console.log('GAME END FROM SERVER');
+				let numWin = document.getElementById("opponent-num-win");
+				let currNumWin = parseInt(numWin.innerHTML);
+				numWin.innerHTML = currNumWin + 1;
+				setTimeout(()=>{
+					this.props.markGameEnd(true);
+					console.log('GAME END FROM SERVER');
+				}, 500);
 			}
 			else {
 				if(data.firstTurn === 1) {
@@ -139,8 +144,8 @@ class BoardContainer extends Component {
 										</div>
 									</div>
 									<div className="match-ratio">
-										<p style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
-										<p style={{ color: "#383834", fontSize: "200%" }}>0</p>
+										<p id="user-num-win" style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
+										<p id="opponent-num-win" style={{ color: "#383834", fontSize: "200%" }}>0</p>
 									</div>
 									<div style={{ width: "40%", display: "flex", justifyContent: "flex-end"}}>
 										{
@@ -168,7 +173,7 @@ class BoardContainer extends Component {
 										(this.props.isGameEnd) ? 
 										(
 											<div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center"}}>
-												<Button>Play Again</Button>
+												<Button onClick={this._replayOnClick}>Play Again</Button>
 											</div>
 										)
 										:
@@ -257,9 +262,14 @@ class BoardContainer extends Component {
 			// }
 			if(gameEnd) {
 				console.log('YOU WON');
-				this.props.markGameEnd(true);
+				let numWin = document.getElementById("user-num-win");
+				let currNumWin = parseInt(numWin.innerHTML);
+				numWin.innerHTML = currNumWin + 1;
+				setTimeout(()=>{
+					this.props.markGameEnd(true);
+					console.log('GAME END FROM SERVER');
+				}, 500);
 			}
-			
 			// setTimeout(() => {
 				
 			// }, 500);
@@ -277,6 +287,14 @@ class BoardContainer extends Component {
 				alert('You lose');
 			}
 		}, 1000);
+	}
+
+	_replayOnClick = () => {
+		this.socket.emit('replay', {});
+		this.props.markGameEnd(false);
+		this.props.markTurn(false);
+		this.props.markTurnNum(-1);
+		this.props.updateBoard(createMap(16, 22));
 	}
 }
 

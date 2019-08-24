@@ -51,6 +51,7 @@ const gameLogic = function(io){
         console.log('New user connected');
         socket.join('global');
         console.log(socket.decoded);
+
         socket.on('create-room', (data) => {
             socket.join(socket.id);
             roomId = socket.id;
@@ -133,6 +134,7 @@ const gameLogic = function(io){
             };
 
             if (data.gameEnd === 1){
+                roomList[roomId].start_ack = 0;
                 msgBody.gameEnd = 1;
                 let winner = roomList[roomId].userList[(roomList[roomId].currTurn + 1) % 2];
                 userService.updateRank(winner,currUser);
@@ -162,7 +164,7 @@ const gameLogic = function(io){
         });
 
         socket.on(('disconnect'), (reason) => {
-            //leaveRoom(socket);
+            // leaveRoom(socket);
             console.log("Disconnenct because " + reason); 
         });
     });

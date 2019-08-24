@@ -6,6 +6,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Ranking from './components/Ranking';
 import { Navbar, Nav } from 'react-bootstrap';
+import Register from './components/Register';
 
 class App extends Component {
   render() {
@@ -14,8 +15,9 @@ class App extends Component {
         <div>
           <Route exact path="/" component={Home} />
           <Route path="/play" component={Board} />
-          <Route path="/login" component={Login}></Route>
-          <Route path="/ranks" component={Ranking}></Route>
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/ranks" component={Ranking} />
         </div>
       </BrowserRouter>
     );
