@@ -15,7 +15,7 @@ const currRoomReducer = (state = initialState, action) => {
     if(action.type === 'MARK_CURRENT_ROOM') {
         return Object.assign({}, state, {
             roomId: action.payload.id,
-            board: createMap(16, 19),
+            board: createMap(16, 22),
             isGameStarted: false,
             creatorRank: action.payload.creatorRank,
             creatorName: action.payload.creatorName,

@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { createMap, updateBoard, checkWin } from '../algo/algo';
+import { updateBoard, checkWin } from '../algo/algo';
 import Cell from './Cell';
 import io from 'socket.io-client';
-import uuidv4 from 'uuid/v4';
 import NavCustom from './NavCustom';
-import { Container, Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
-import { Card, Image } from 'semantic-ui-react';
+import { Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
+import { Card, Image, Progress } from 'semantic-ui-react';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
-import { markCurrentRoom, markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd } from '../actions/actions';
+import { markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd } from '../actions/actions';
 import { connect } from 'react-redux';
 import getUser from '../helper/getUser';
 
@@ -63,6 +62,10 @@ class BoardContainer extends Component {
 			query: { token: localStorage.getItem('token') }
 		});
 
+		
+	}
+
+	componentDidMount() {
 		this.socket.on('start-game', (data) => {
 			console.log('Emit game ack');
 			if(this.opponent === null) {
@@ -107,10 +110,10 @@ class BoardContainer extends Component {
 			}
 			this.props.markTurn(turnMark);
 			this.props.markTurnNum(data.currTurn);
+			//this._timePassForProgressBar();
 		});
 		console.log("COnstructor done");
 	}
-
 	// componentDidMount() {
 	// 	this.socket.emit('join', { 'roomId': this.roomId, 'user': this.user });
 	// 	console.log("Event emitted");
@@ -121,8 +124,8 @@ class BoardContainer extends Component {
 			<div className="background-img">
 				<div className="background-color-effect-dark">
 				<NavCustom></NavCustom>
-					<div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-						<Card className="play-game-container" style={{ width: "140vmin" }}>
+					<div style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignContent: "center" }}>
+						<Card className="play-game-container" style={{ width: "140vmin", "height": "86vh" }}>
 							<div className="opponent-time-progress-container">
 								<div style={{height: "22vmin", width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-end"}}>
 									<div id="play-user-info" className="play-user-info">
@@ -157,10 +160,10 @@ class BoardContainer extends Component {
 										}
 									</div>
 								</div>
-								<ProgressBar style={{ width: "100%" }} animated now={45} />
+								<Progress id="progress-bar" style={{ width: "100%" }} percent={45} color="teal" size="small" />
 							</div>
 							<div className="board-chat-container" style={{ border: "0", padding: "0" }}>
-								<Col md={6.5} className="board" style={{ padding: "0", border: "0"}}>
+								<Col md={7.5} className="board" style={{ padding: "0", border: "0" }}>
 									{
 										(this.props.isGameEnd) ? 
 										(
@@ -169,12 +172,16 @@ class BoardContainer extends Component {
 											</div>
 										)
 										:
-										this._renderBoard(this.props.board)
+										<div>
+										{
+											this._renderBoard(this.props.board)
+										}
+										</div>
 									}
 								</Col>
-								<Col md = {4} className="room-name-chat-container" style={{ padding: 0 }}>
+								<Col md = {3} className="room-name-chat-container" style={{ padding: 0 }}>
 									<Card className="room-name-chat-container-card" style={{width: "100%"}}>
-									<Image style={{maxHeight: "15vmin", width: "100%"}} src='https://react.semantic-ui.com/images/avatar/large/matthew.png' fluid />
+									<Image style={{maxHeight: "15vmin", width: "100%" }} src='https://react.semantic-ui.com/images/avatar/large/matthew.png' fluid />
 										<Card.Content>
 											<Card.Header>
 												Game Room
@@ -257,6 +264,19 @@ class BoardContainer extends Component {
 				
 			// }, 500);
 		}
+	}
+
+	_timePassForProgressBar =  async () => {
+		let progressBar = document.getElementById("progress-bar");
+		let timePass = 0;
+		let interval = setInterval(function(){
+			timePass += 20;
+			progressBar.props.now = timePass;
+			if(timePass === 100) {
+				window.clearInterval(interval);
+				alert('You lose');
+			}
+		}, 1000);
 	}
 }
 
