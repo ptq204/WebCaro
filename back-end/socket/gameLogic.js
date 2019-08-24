@@ -1,4 +1,5 @@
 var roomList = [];
+var roomListInfo = [];
 const userService = require('../service/UserService');
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 const jwt = require('jsonwebtoken');
@@ -16,23 +17,43 @@ const gameLogic = function(io){
     const leaveRoom = (socket) => {
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
-        if (roomList[roomId].status === 0){
-            io.in('global').emit('room-close', {
-                id: roomId
-            });
-            delete roomList[roomId];
-        } else {
-            if (roomList[roomId].status === 2){
-                let winner = (userList.indexOf(socket.id) + 1) % 2;
-                userService.updateRank(userList[winner], socket.id);
-            }
-            let index = userList.indexOf(socket.id);
-            userList.slice(index,1);
-            roomList[roomId].status = 0;
-            roomList[roomId].replay = 0;
-            roomList[roomId].start_ack = 0;
-            socket.to(roomId).emit('other-disconnect',{});
+        delete roomList[roomId];
+        io.in('global').emit('room-close', {
+            id: roomId
+        });
+        if (roomList[roomId].status === 2){
+            let winner = (userList.indexOf(socket.id) + 1) % 2;
+            userService.updateRank(userList[winner], socket.id);
         }
+        let index = userList.indexOf(socket.id);
+        userList.slice(index,1);
+        let leftUserid = userList[0];
+        let newRoom ={
+            userList: userList,
+            currTurn: 0,
+            status : 0,
+            start_ack: 0
+        };
+        roomList[leftUserid] = newRoom;
+
+        let date = getCurrentDate();
+        let callback = (params) => {
+            let newRoom = {
+                id: leftUserid,
+                creator: {
+                    username: params.username,
+                    rank: params.rank
+                },
+                name: data.roomName,
+                createdAt: date,
+                status: 0
+            };
+            roomListInfo[socket.id] = newRoom
+            socket.to('global').emit('new-room', newRoom);
+            socket.to(roomId).emit('other-disconnect',newRoom);
+        };
+        userService.getUser(leftUserid, callback);
+
         roomId=""; 
     };
 
@@ -52,6 +73,7 @@ const gameLogic = function(io){
         socket.join('global');
         console.log(socket.decoded);
 
+        socket.emit('room-list', roomListInfo);
         socket.on('create-room', (data) => {
             socket.join(socket.id);
             roomId = socket.id;
@@ -59,7 +81,6 @@ const gameLogic = function(io){
                 userList: [socket.id],
                 currTurn: 0,
                 status : 0,
-                replay: 0,
                 start_ack: 0
             };
             roomList[socket.id] = newRoom;
@@ -69,7 +90,7 @@ const gameLogic = function(io){
             console.log(roomList);
             let date = getCurrentDate();
             let callback = (params) => {
-                socket.to('global').emit('new-room', {
+                let newRoom = {
                     id: socket.id,
                     creator: {
                         username: params.username,
@@ -78,7 +99,9 @@ const gameLogic = function(io){
                     name: data.roomName,
                     createdAt: date,
                     status: 0
-                });
+                };
+                roomListInfo[socket.id] = newRoom
+                socket.to('global').emit('new-room', newRoom);
             };
             userService.getUser(socket.id, callback);
 
@@ -99,7 +122,7 @@ const gameLogic = function(io){
                     username: joinedUser.username,
                     rank: joinedUser.rank
                 }});
-                socket.to('global').emit('room-status-change', {
+                socket.to('global').emit('room-full', {
                     id: roomId
                 });
             };
@@ -119,6 +142,9 @@ const gameLogic = function(io){
                 io.in(roomId).emit('start-playing', {'message': 'PLAY DI'});
                 setTimeout(() => {
                     io.in(roomId).emit('turn', {user: currUser, currTurn: roomList[roomId].currTurn, firstTurn: 1});
+                    socket.to('global').emit('room-start-playing', {
+                        id: roomId
+                    });
                     roomList[roomId].currTurn++;
                     console.log('Start at: ' + currUser);
                 }, 2000);
@@ -138,7 +164,9 @@ const gameLogic = function(io){
                 msgBody.gameEnd = 1;
                 let winner = roomList[roomId].userList[(roomList[roomId].currTurn + 1) % 2];
                 userService.updateRank(winner,currUser);
-            } else {
+                socket.to('global').emit('room-full', {
+                    id: roomId
+                });
                 msgBody.gameEnd = 0;   
             }
 
@@ -147,11 +175,11 @@ const gameLogic = function(io){
         });
 
         socket.on('replay', (data) => {
-            if (roomList[roomId].replay === 1){
-                roomList[roomId].replay = 0;
+            if (roomList[roomId].start_ack === 1){
+                roomList[roomId].start_ack = 0;
                 io.in(roomId).emit('start-game', {});
             } else {
-                roomList[roomId].replay = 1;
+                roomList[roomId].start_ack = 1;
             }
         });
 
