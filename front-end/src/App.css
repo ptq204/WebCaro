@@ -56,20 +56,22 @@ body, html {
   display: flex;
   flex-direction: row;
   width: 140vmin;
+  height: 5vmin;
   justify-content: center;
 }
 
 .container-nav-brand {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   width: 70vmin;
 }
 
 .container-nav-rank-logout {
   display: flex;
-  flex-direction: row;
   justify-content: flex-end;
-  width: 70vmin;
+  align-items: center;
+  width: 100%;
 }
 
 .room-list-container {
@@ -118,7 +120,7 @@ body, html {
   margin-bottom: 10px;
   padding-left: 20px;
   padding-right: 20px;
-  height: 12vmin;
+  height: 16vmin;
 }
 
 .room-item-name {

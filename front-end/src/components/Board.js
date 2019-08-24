@@ -117,6 +117,11 @@ class BoardContainer extends Component {
 			this.props.markTurnNum(data.currTurn);
 			//this._timePassForProgressBar();
 		});
+
+		this.socket.on('want-replay', (data) => {
+			document.getElementById('replay-message').innerHTML = "Your's opponent want to replay";
+		})
+
 		console.log("COnstructor done");
 	}
 	// componentDidMount() {
@@ -172,8 +177,9 @@ class BoardContainer extends Component {
 									{
 										(this.props.isGameEnd) ? 
 										(
-											<div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+											<div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
 												<Button onClick={this._replayOnClick}>Play Again</Button>
+												<p id="replay-message" style={{color: "black", fontSize: "150%", fontWeight: "bold"}}></p>
 											</div>
 										)
 										:
@@ -186,7 +192,7 @@ class BoardContainer extends Component {
 								</Col>
 								<Col md = {3} className="room-name-chat-container" style={{ padding: 0 }}>
 									<Card className="room-name-chat-container-card" style={{width: "100%"}}>
-									<Image style={{maxHeight: "15vmin", width: "100%" }} src='https://react.semantic-ui.com/images/avatar/large/matthew.png' fluid />
+									<Image style={{maxHeight: "15vmin", width: "100%" }} src='/images/tic-tac-toe.png' fluid />
 										<Card.Content>
 											<Card.Header>
 												Game Room
@@ -197,12 +203,12 @@ class BoardContainer extends Component {
 											</div>
 											<InputGroup style={{ marginTop: "2vmin" }} className="mb-3 chat-input">
 												<FormControl
-													placeholder="Recipient's username"
-													aria-label="Recipient's username"
+													placeholder="chat here"
+													aria-label="chat here"
 													aria-describedby="basic-addon2"
 												/>
 												<InputGroup.Append>
-													<Button variant="primary">Button</Button>
+													<Button variant="primary">Send</Button>
 												</InputGroup.Append>
 											</InputGroup>
 										</div>
