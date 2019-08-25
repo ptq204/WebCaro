@@ -175,6 +175,8 @@ const gameLogic = function(io){
                 socket.to('global').emit('room-full', {
                     id: roomId
                 });
+            }
+            else {
                 msgBody.gameEnd = 0;
             }
 
