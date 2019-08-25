@@ -134,7 +134,7 @@ class BoardContainer extends Component {
 		this.socket.on('other-disconnect', (data) => {
 			this.opponent = null;
 			if (this.props.status === 2) {
-				this._updateNumWinOfPlayer('opponent-num-win');
+				this._updateNumWinOfPlayer('user-num-win');
 			}
 			this.socket.emit('create-room', { 'oldRoomId': data.oldRoomId, 'roomName': 'New room' });
 			let newRoom = {
@@ -333,7 +333,7 @@ class BoardContainer extends Component {
 	}
 
 	_leaveRoom = () => {
-		this.socket.emit('leave-room');
+		this.socket.emit('leave-room', {id: this.props.roomId});
 		this.props.history.push('/');
 	}
 

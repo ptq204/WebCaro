@@ -12,8 +12,10 @@ const getCurrentDate = () => {
 };
 
 const gameLogic = function(io){
+    let roomId = "";
     const leaveRoom = (socket, roomId) => {
       if  (roomId) {
+        console.log('LEAVING ' + roomId);
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
 
@@ -79,7 +81,7 @@ const gameLogic = function(io){
         }
     })
     .on('connection', (socket) => {
-        let roomId = "";
+        //let roomId = "";
         console.log('New user connected');
         socket.join('global');
         console.log(socket.decoded);
@@ -152,6 +154,7 @@ const gameLogic = function(io){
         });
 
         socket.on('game-ack', () => {
+            console.log('GAME ACKKKKK ' + roomId);
             roomList[roomId].start_ack++;
             console.log(roomList[roomId].start_ack);
             if (roomList[roomId].start_ack === 2){
@@ -210,12 +213,13 @@ const gameLogic = function(io){
             socket.to(roomId).emit('chat', data.msg);
         });
 
-        socket.on('leave-room', () => {
-             leaveRoom(socket, roomId);
+        socket.on('leave-room', (data) => {
+            console.log('LEAVEEEE ' + data.id);
+             leaveRoom(socket, data.id);
         });
 
         socket.on(('disconnect'), (reason) => {
-            leaveRoom(socket, roomId);
+            //leaveRoom(socket, roomId);
             console.log("Disconnenct because " + reason);
         });
     });
