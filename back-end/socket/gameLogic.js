@@ -12,14 +12,13 @@ const getCurrentDate = () => {
 };
 
 const gameLogic = function(io){
+    let roomId = "";
     const leaveRoom = (socket, roomId) => {
       if  (roomId) {
+        console.log('LEAVING ' + roomId);
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
 
-        io.in('global').emit('room-close', {
-            id: roomId
-        });
         if (roomList[roomId].status === 2){
             let winner = (userList.indexOf(socket.id) + 1) % 2;
             userService.updateRank(userList[winner], socket.id);
@@ -30,7 +29,13 @@ const gameLogic = function(io){
         let leftUserid = userList[0];
         let oldName = roomListInfo[roomId].name;
 		delete roomList[roomId];
-		delete roomListInfo[roomId];
+        delete roomListInfo[roomId];
+        
+        io.in('global').emit('room-close', {
+            id: roomId
+        });
+
+        console.log(roomListInfo);
         // let newRoom ={
         //     userList: userList,
         //     currTurn: 0,
@@ -76,7 +81,7 @@ const gameLogic = function(io){
         }
     })
     .on('connection', (socket) => {
-        let roomId = "";
+        //let roomId = "";
         console.log('New user connected');
         socket.join('global');
         console.log(socket.decoded);
@@ -149,6 +154,7 @@ const gameLogic = function(io){
         });
 
         socket.on('game-ack', () => {
+            console.log('GAME ACKKKKK ' + roomId);
             roomList[roomId].start_ack++;
             console.log(roomList[roomId].start_ack);
             if (roomList[roomId].start_ack === 2){
@@ -163,7 +169,7 @@ const gameLogic = function(io){
                     });
                     roomList[roomId].currTurn++;
                     console.log('Start at: ' + currUser);
-                }, 2000);
+                }, 5000);
             }
         });
 
@@ -207,12 +213,13 @@ const gameLogic = function(io){
             socket.to(roomId).emit('chat', data.msg);
         });
 
-        socket.on('leave-room', () => {
-             leaveRoom(socket, roomId);
+        socket.on('leave-room', (data) => {
+            console.log('LEAVEEEE ' + data.id);
+             leaveRoom(socket, data.id);
         });
 
         socket.on(('disconnect'), (reason) => {
-            leaveRoom(socket, roomId);
+            //leaveRoom(socket, roomId);
             console.log("Disconnenct because " + reason);
         });
     });

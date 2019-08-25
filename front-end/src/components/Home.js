@@ -89,10 +89,9 @@ class ConnectedHome extends Component {
     });
 
     this.socket.on('room-close', (data) => {
-      console.log('ROOM CLOSE');
-      let roomList = this.props.roomList;
-      roomList.splice(roomList.findIndex(room => room.id === data.id), 1);
-      this.props.changeRoomList(roomList);
+      console.log('ROOM CLOSE ' + data.id);
+      this.props.roomList.splice(this.props.roomList.findIndex(room => room.id === data.id), 1);
+      this.props.changeRoomList(this.props.roomList);
     });
 
     window.onclick = function (event) {

@@ -5,6 +5,7 @@ import currRoomReducer from './mark-current-room';
 import loginReducer from './change-login';
 import registerReducer from './change-register';
 import inputRoomNameReducer from './change-input-room-name';
+import rankListReducer from './change-rank-list';
 
 const reducers = combineReducers({
     changeRoomList: roomListReducer,
@@ -12,7 +13,8 @@ const reducers = combineReducers({
     markCurrentRoom: currRoomReducer,
     login: loginReducer,
     register: registerReducer,
-    inputRoomName: inputRoomNameReducer
+    inputRoomName: inputRoomNameReducer,
+    ranks: rankListReducer
 });
 
 export default reducers;
