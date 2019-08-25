@@ -54,6 +54,10 @@ const changeRegisterPassword = (payload) => {
     return {type: 'CHANGE_REGISTER_PASSWORD', payload}
 }
 
+const changeInputRoomName = (payload) => {
+    return {type: 'CHANGE_INPUT_ROOM_NAME', payload}
+}
+
 module.exports = {
     changeRoomList: changeRoomList,
     getUserInfo: getUserInfo,
@@ -69,4 +73,5 @@ module.exports = {
     setLoggedIn: setLoggedIn,
     changeRegisterUsername: changeRegisterUsername,
     changeRegisterPassword: changeRegisterPassword,
+    changeInputRoomName: changeInputRoomName
 }

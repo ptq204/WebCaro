@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Form, Button, Navbar, Nav, Col, Container, Row } from 'react-bootstrap';
-import { Popup } from 'semantic-ui-react';
+import { Popup, Input } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import NavCustom from './NavCustom';
 import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
-import { changeRoomList, getUserInfo, markCurrentRoom } from '../actions/actions';
+import { changeRoomList, getUserInfo, markCurrentRoom, changeInputRoomName } from '../actions/actions';
 import { SERVER_URL } from '../config/config';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
@@ -17,7 +17,8 @@ const mapStateToProps = state => {
   return {
     roomList: state.changeRoomList.roomList,
     userInfo: state.getUserInfo.user,
-    currRoom: state.markCurrentRoom.roomId
+    currRoom: state.markCurrentRoom.roomId,
+    inputRoomName: state.inputRoomName.roomName
   }
 }
 
@@ -25,7 +26,8 @@ const mapDispatchToProps = (disPatch) => {
   return {
     changeRoomList: roomList => disPatch(changeRoomList(roomList)),
     getUserInfo: user => disPatch(getUserInfo(user)),
-    markCurrentRoom: roomItem => disPatch(markCurrentRoom(roomItem))
+    markCurrentRoom: roomItem => disPatch(markCurrentRoom(roomItem)),
+    changeInputRoomName: roomName => disPatch(changeInputRoomName(roomName))
   }
 }
 
@@ -91,7 +93,14 @@ class ConnectedHome extends Component {
       let roomList = this.props.roomList;
       roomList.splice(roomList.findIndex(room => room.id === data.id), 1);
       this.props.changeRoomList(roomList);
-    })
+    });
+
+    window.onclick = function (event) {
+      let dialog = document.getElementById('room-name-input-dialog');
+      if (event.target == dialog) {
+        dialog.style.display = 'none';
+      }
+    }
   }
 
   render() {
@@ -101,9 +110,19 @@ class ConnectedHome extends Component {
         <div className="background-img">
           <div className="background-color-effect-dark">
             <NavCustom></NavCustom>
+            <div id="room-name-input-dialog" className="room-name-input-dialog">
+              <div id="room-name-input-dialog-content" className="room-name-input-dialog-content">
+                <Input
+                  style={{minWidth: "80%"}}
+                  action={{content: 'OK', color: 'teal', onClick: () => this._createNewGameRoom(this.props.inputRoomName) }}
+                  placeholder="Enter room name"
+                  onChange={(e) => this._handleChangeInputRoomName(e)}
+                />
+              </div>
+            </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <div className="home-create-join-button-container">
-                <Button style={{ marginRight: "20px", height: "40%" }} onClick={this._createNewGameRoom}>Create room</Button>
+                <Button style={{ marginRight: "20px", height: "40%" }} onClick={this._openRoomNameInputDialog}>Create room</Button>
                 <Button style={{ height: "40%" }} onClick={() => this.props.changeRoomList(gameRooms)}>Join random</Button>
               </div>
             </div>
@@ -160,9 +179,7 @@ class ConnectedHome extends Component {
         <div style={{ width: "80%", display: "flex", alignItems: "center" }}>
           <div>
             <Popup trigger={<Link to={{ pathname: `/play`, state: { roomId: roomItem.id } }} className="room-item-name">{roomItem.name}</Link>}>
-              Hello. This is a regular pop-up which does not allow for lots of content.
-              You cannot fit a lot of words here as the paragraphs will be pretty
-              narrow.
+              {roomItem.id}
             </Popup>
             <p className="room-item-creator">{roomItem.creatorName}</p>
             <p className="room-item-created-at">{roomItem.createdAt}</p>
@@ -176,8 +193,8 @@ class ConnectedHome extends Component {
   }
 
   // Create new room ('create-room', {roomName: String})
-  _createNewGameRoom = () => {
-    var roomName = 'room03';
+  _createNewGameRoom = (roomName) => {
+    this.props.changeInputRoomName('');
     this.socket.emit('create-room', { 'roomName': roomName });
   }
 
@@ -207,6 +224,15 @@ class ConnectedHome extends Component {
     this.props.markCurrentRoom(roomItem);
     this.socket.emit('join', { 'roomId': roomItem.id });
     this.props.history.push('/play');
+  }
+
+  _openRoomNameInputDialog = () => {
+    let dialog = document.getElementById('room-name-input-dialog');
+    dialog.style.display = 'block';
+  }
+
+  _handleChangeInputRoomName = (e) => {
+    this.props.changeInputRoomName(e.target.value);
   }
 }
 
