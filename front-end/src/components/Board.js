@@ -7,7 +7,7 @@ import { Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstr
 import { Card, Image, Progress } from 'semantic-ui-react';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
-import { markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd } from '../actions/actions';
+import { markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd, markCurrentRoom, markStatus } from '../actions/actions';
 import { connect } from 'react-redux';
 import getUser from '../helper/getUser';
 
@@ -22,7 +22,9 @@ const mapStateToProps = state => {
 		username: state.getUserInfo.user.username,
 		userrank: state.getUserInfo.user.rank,
 		creatorName: state.markCurrentRoom.creatorName,
-		creatorRank: state.markCurrentRoom.creatorRank
+		creatorRank: state.markCurrentRoom.creatorRank,
+		status: state.markCurrentRoom.status,
+		name: state.markCurrentRoom.name
 	}
 }
 
@@ -32,7 +34,9 @@ const mapDispatchToProps = (disPatch) => {
 		updateBoard: board => disPatch(updateBoardState(board)),
 		markTurn: turnMark => disPatch(markTurn(turnMark)),
 		markTurnNum: turnNum => disPatch(markTurnNum(turnNum)),
-		markGameEnd: gameEnd => disPatch(markGameEnd(gameEnd))
+		markGameEnd: gameEnd => disPatch(markGameEnd(gameEnd)),
+		markCurrentRoom: newRoom => disPatch(markCurrentRoom(newRoom)),
+		markStatus: status => disPatch(markStatus(status))
 	}
 }
 class BoardContainer extends Component {
@@ -45,8 +49,11 @@ class BoardContainer extends Component {
 		// 	isYourTurn: false,
 		// 	currTurn: null
 		// }'
+		let currUser = JSON.parse(getUser(localStorage.getItem('token')));
+		this.user = currUser.id;
+
 		this.opponent = null;
-		if(this.props.creatorName !== undefined) {
+		if (this.props.creatorName !== undefined && this.props.username !== this.props.creatorName) {
 			this.opponent = {
 				username: this.props.creatorName,
 				rank: this.props.creatorRank
@@ -68,39 +75,39 @@ class BoardContainer extends Component {
 	componentDidMount() {
 		this.socket.on('start-game', (data) => {
 			console.log('Emit game ack');
-			if(this.opponent === null) {
+			if (this.opponent === null) {
 				this.opponent = {
 					username: data.joining.username,
 					rank: data.joining.rank
 				}
 			}
 			this.socket.emit('game-ack', {});
+			this.props.markStatus(1);
 		});
 
 		this.socket.on('start-playing', (data) => {
 			this.props.markGameStart();
+			this.props.markStatus(2);
 		})
 
 		this.socket.on('turn', (data) => {
 			console.log(data);
 			let turnMark = false;
-			if(data.updatedBoard) {
+			if (data.updatedBoard) {
 				this.props.updateBoard(data.updatedBoard);
 			}
 
-			if(data.gameEnd === 1) {
-				let numWin = document.getElementById("opponent-num-win");
-				let currNumWin = parseInt(numWin.innerHTML);
-				numWin.innerHTML = currNumWin + 1;
-				setTimeout(()=>{
+			if (data.gameEnd === 1) {
+				this._updateNumWinOfPlayer('opponent-num-win');
+				setTimeout(() => {
 					this.props.markGameEnd(true);
 					console.log('GAME END FROM SERVER');
 				}, 500);
+
 			}
 			else {
-				if(data.firstTurn === 1) {
-					let currUser = JSON.parse(getUser(localStorage.getItem('token')));
-					if(currUser.id === data.user) {
+				if (data.firstTurn === 1) {
+					if (this.user === data.user) {
 						turnMark = true;
 						console.log('You go first');
 					}
@@ -123,6 +130,23 @@ class BoardContainer extends Component {
 		})
 
 		console.log("COnstructor done");
+
+		this.socket.on('other-disconnect', (data) => {
+			this.opponent = null;
+			if (this.props.status === 2) {
+				this._updateNumWinOfPlayer('opponent-num-win');
+			}
+			this.socket.emit('create-room', { 'oldRoomId': data.oldRoomId, 'roomName': 'New room' });
+			let newRoom = {
+				id: this.user,
+				creatorName: this.props.username,
+				creatorRank: this.props.userrank,
+				name: 'New room',
+				createdAt: new Date(),
+				status: 0
+			}
+			this.props.markCurrentRoom(newRoom);
+		});
 	}
 	// componentDidMount() {
 	// 	this.socket.emit('join', { 'roomId': this.roomId, 'user': this.user });
@@ -133,18 +157,18 @@ class BoardContainer extends Component {
 		return (
 			<div className="background-img">
 				<div className="background-color-effect-dark">
-				<NavCustom></NavCustom>
+					<NavCustom></NavCustom>
 					<div style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignContent: "center" }}>
 						<Card className="play-game-container" style={{ width: "140vmin", "height": "86vh" }}>
 							<div className="opponent-time-progress-container">
-								<div style={{height: "22vmin", width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-end"}}>
+								<div style={{ height: "22vmin", width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-end" }}>
 									<div id="play-user-info" className="play-user-info">
-										<img style={{height: "80%"}} src={getRankBadge(this.props.userrank)}></img>
+										<img style={{ height: "80%" }} src={getRankBadge(this.props.userrank)}></img>
 										<div>
-											<p className="play-game-username">{ this.props.username }</p>
+											<p className="play-game-username">{this.props.username}</p>
 											<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
 												<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-												<p className="play-game-userrank">{ this.props.userrank }</p>
+												<p className="play-game-userrank">{this.props.userrank}</p>
 											</div>
 										</div>
 									</div>
@@ -152,21 +176,21 @@ class BoardContainer extends Component {
 										<p id="user-num-win" style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
 										<p id="opponent-num-win" style={{ color: "#383834", fontSize: "200%" }}>0</p>
 									</div>
-									<div style={{ width: "40%", display: "flex", justifyContent: "flex-end"}}>
+									<div style={{ width: "40%", display: "flex", justifyContent: "flex-end" }}>
 										{
 											(this.opponent !== null) ?
-											<div id="play-opponent-info" className="play-opponent-info">
-												<div>
-													<p className="play-game-username">{ this.opponent.username }</p>
-													<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-														<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-														<p className="play-game-userrank">{ this.opponent.rank }</p>
+												<div id="play-opponent-info" className="play-opponent-info">
+													<div>
+														<p className="play-game-username">{this.opponent.username}</p>
+														<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+															<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+															<p className="play-game-userrank">{this.opponent.rank}</p>
+														</div>
 													</div>
+													<img style={{ height: "80%" }} src={getRankBadge(this.opponent.rank)}></img>
 												</div>
-												<img style={{height: "80%"}} src={getRankBadge(this.opponent.rank)}></img>
-											</div>
-											:
-											<p>Waiting...</p>
+												:
+												<p>Waiting...</p>
 										}
 									</div>
 								</div>
@@ -176,26 +200,33 @@ class BoardContainer extends Component {
 								<Col md={7.5} className="board" style={{ padding: "0", border: "0" }}>
 									{
 										(this.props.isGameEnd) ?
-										(
-											<div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-												<Button onClick={this._replayOnClick}>Play Again</Button>
-												<p id="replay-message" style={{color: "black", fontSize: "150%", fontWeight: "bold"}}></p>
+											(
+												<div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+													<Button onClick={this._replayOnClick}>Play Again</Button>
+													<p id="replay-message" style={{ color: "black", fontSize: "150%", fontWeight: "bold" }}></p>
+												</div>
+											)
+											:
+											<div>
+												{
+													(this.props.isGameStarted) ?
+														this._renderBoard(this.props.board)
+														:
+														<div>
+															<span className="number-countdown"></span>
+														</div>
+												}
 											</div>
-										)
-										:
-										<div>
-										{
-											this._renderBoard(this.props.board)
-										}
-										</div>
 									}
 								</Col>
-								<Col md = {3} className="room-name-chat-container" style={{ padding: 0 }}>
-									<Card className="room-name-chat-container-card" style={{width: "100%"}}>
-									<Image style={{maxHeight: "15vmin", width: "100%" }} src='/images/tic-tac-toe.png' fluid />
+								<Col md={3} className="room-name-chat-container" style={{ padding: 0 }}>
+									<Card className="room-name-chat-container-card" style={{ width: "100%" }}>
+										<Image style={{ maxHeight: "15vmin", width: "100%" }} src='/images/tic-tac-toe.png' fluid>
+											<p className="board-room-name">{this.props.name}</p>
+										</Image>
 										<Card.Content>
 											<Card.Header>
-												Game Room
+												<Button onClick={this._leaveRoom}>Leave</Button>
 											</Card.Header>
 										</Card.Content>
 										<div className="chat-layout-container">
@@ -223,7 +254,7 @@ class BoardContainer extends Component {
 	}
 
 	_renderBoard = (m) => {
-		if(m !== null) {
+		if (m !== null) {
 			return m.map((datarow, i) => (
 				<div key={i} className="board-row">
 					{
@@ -266,12 +297,10 @@ class BoardContainer extends Component {
 			// if (gameEnd === 1) {
 			// 	alert('You won');
 			// }
-			if(gameEnd) {
+			if (gameEnd) {
 				console.log('YOU WON');
-				let numWin = document.getElementById("user-num-win");
-				let currNumWin = parseInt(numWin.innerHTML);
-				numWin.innerHTML = currNumWin + 1;
-				setTimeout(()=>{
+				this._updateNumWinOfPlayer('user-num-win');
+				setTimeout(() => {
 					this.props.markGameEnd(true);
 					console.log('GAME END FROM SERVER');
 				}, 500);
@@ -282,13 +311,13 @@ class BoardContainer extends Component {
 		}
 	}
 
-	_timePassForProgressBar =  async () => {
+	_timePassForProgressBar = async () => {
 		let progressBar = document.getElementById("progress-bar");
 		let timePass = 0;
-		let interval = setInterval(function(){
+		let interval = setInterval(function () {
 			timePass += 20;
 			progressBar.props.now = timePass;
-			if(timePass === 100) {
+			if (timePass === 100) {
 				window.clearInterval(interval);
 				alert('You lose');
 			}
@@ -301,6 +330,24 @@ class BoardContainer extends Component {
 		this.props.markTurn(false);
 		this.props.markTurnNum(-1);
 		this.props.updateBoard(createMap(16, 22));
+	}
+
+	_leaveRoom = () => {
+		this.socket.emit('leave-room');
+		this.props.history.push('/');
+	}
+
+	_updateNumWinOfPlayer = (id) => {
+		let numWin = document.getElementById(id);
+		let currNumWin = parseInt(numWin.innerHTML);
+		numWin.innerHTML = currNumWin + 1;
+	}
+
+	_countDown = (s) => {
+		num.innerHTML = s;
+		setTimeout(function () {
+			newSec();
+		}, speed);
 	}
 }
 

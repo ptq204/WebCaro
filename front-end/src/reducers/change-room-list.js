@@ -1,5 +1,7 @@
 const initialState = {
-    roomList: []
+    roomList: [{
+        'blank': 1
+    }]
 }
 
 const roomListReducer = (state=initialState, action) => {

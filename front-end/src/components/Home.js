@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Button, Navbar, Nav, Col, Container, Row } from 'react-bootstrap';
+import { Popup } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import NavCustom from './NavCustom';
 import { gameRooms, userInformation } from '../mock/data';
@@ -56,7 +57,15 @@ class ConnectedHome extends Component {
     });
 
     this.socket.on('room-created', (data) => {
-      this.props.markCurrentRoom(data);
+      let createdRoom = {
+        id: data.id,
+        name: data.name,
+        creatorName: this.props.userInfo.username,
+        creatorRank: this.props.userInfo.rank,
+        createdAt: new Date(),
+        status: 0
+      }
+      this.props.markCurrentRoom(createdRoom);
       console.log(this.props.currRoom);
       this.props.history.push('/play');
     });
@@ -64,7 +73,7 @@ class ConnectedHome extends Component {
     this.socket.on('room-list', (data) => {
       console.log('ROOM LIST');
       let roomList = [];
-      for(var key in data) {
+      for (var key in data) {
         roomList.push({
           id: data[key].id,
           creatorName: data[key].creator.username,
@@ -74,6 +83,13 @@ class ConnectedHome extends Component {
           status: data[key].status
         });
       }
+      this.props.changeRoomList(roomList);
+    });
+
+    this.socket.on('room-close', (data) => {
+      console.log('ROOM CLOSE');
+      let roomList = this.props.roomList;
+      roomList.splice(roomList.findIndex(room => room.id === data.id), 1);
       this.props.changeRoomList(roomList);
     })
   }
@@ -141,10 +157,16 @@ class ConnectedHome extends Component {
   _renderRoomItem = (roomItem, i) => {
     return (
       <div className="room-item">
-        <div style={{ width: "50%" }}>
-          <Link to={{ pathname: `/play`, state: { roomId: roomItem.id } }} className="room-item-name">{roomItem.name}</Link>
-          <p className="room-item-creator">{roomItem.creatorName}</p>
-          <p className="room-item-created-at">{ roomItem.createdAt}</p>
+        <div style={{ width: "80%", display: "flex", alignItems: "center" }}>
+          <div>
+            <Popup trigger={<Link to={{ pathname: `/play`, state: { roomId: roomItem.id } }} className="room-item-name">{roomItem.name}</Link>}>
+              Hello. This is a regular pop-up which does not allow for lots of content.
+              You cannot fit a lot of words here as the paragraphs will be pretty
+              narrow.
+            </Popup>
+            <p className="room-item-creator">{roomItem.creatorName}</p>
+            <p className="room-item-created-at">{roomItem.createdAt}</p>
+          </div>
         </div>
         <div className="room-item-join-button">
           <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }} onClick={() => this._joinRoom(roomItem)}>Join</Button>
