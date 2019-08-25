@@ -15,9 +15,9 @@ const gameLogic = function(io){
     let roomId = "";
 
     const leaveRoom = (socket) => {
+      if  (roomId){
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
-        delete roomList[roomId];
         io.in('global').emit('room-close', {
             id: roomId
         });
@@ -28,6 +28,8 @@ const gameLogic = function(io){
         let index = userList.indexOf(socket.id);
         userList.slice(index,1);
         let leftUserid = userList[0];
+        let oldName = roomListInfo[roomId].name;
+        delete roomList[roomId];
         let newRoom ={
             userList: userList,
             currTurn: 0,
@@ -44,7 +46,7 @@ const gameLogic = function(io){
                     username: params.username,
                     rank: params.rank
                 },
-                name: data.roomName,
+                name: oldName,
                 createdAt: date,
                 status: 0
             };
@@ -54,7 +56,9 @@ const gameLogic = function(io){
         };
         userService.getUser(leftUserid, callback);
 
-        roomId=""; 
+        roomId="";
+      }
+
     };
 
     io.use(function(socket, next){
@@ -66,18 +70,18 @@ const gameLogic = function(io){
           });
         } else {
             next(new Error('Authentication error'));
-        }    
+        }
     })
     .on('connection', (socket) => {
         console.log('New user connected');
         socket.join('global');
         console.log(socket.decoded);
-        
+
         setTimeout(()=>{
             console.log(roomListInfo);
             socket.emit('room-list', roomListInfo);
         },500);
-        
+
         socket.on('create-room', (data) => {
             socket.join(socket.id);
             roomId = socket.id;
@@ -130,12 +134,12 @@ const gameLogic = function(io){
                     id: roomId
                 });
             };
-            
+
             userService.getUser(socket.id, callback);
-            
-            
-        }); 
-    
+
+
+        });
+
         socket.on('game-ack', () => {
             roomList[roomId].start_ack++;
             console.log(roomList[roomId].start_ack);
@@ -192,17 +196,16 @@ const gameLogic = function(io){
         socket.on('chat', (data) => {
             socket.to(roomId).emit('chat', data.msg);
         });
-        
+
         socket.on('leave-room', () => {
              leaveRoom(socket);
         });
 
         socket.on(('disconnect'), (reason) => {
-            // leaveRoom(socket);
-            console.log("Disconnenct because " + reason); 
+            leaveRoom(socket);
+            console.log("Disconnenct because " + reason);
         });
     });
 
 };
-
 module.exports = gameLogic;
