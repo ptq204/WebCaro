@@ -18,6 +18,7 @@ const gameLogic = function(io){
       if  (roomId){
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
+
         io.in('global').emit('room-close', {
             id: roomId
         });
@@ -25,37 +26,41 @@ const gameLogic = function(io){
             let winner = (userList.indexOf(socket.id) + 1) % 2;
             userService.updateRank(userList[winner], socket.id);
         }
+        
         let index = userList.indexOf(socket.id);
         userList.slice(index,1);
         let leftUserid = userList[0];
         let oldName = roomListInfo[roomId].name;
-        delete roomList[roomId];
-        let newRoom ={
-            userList: userList,
-            currTurn: 0,
-            status : 0,
-            start_ack: 0
-        };
-        roomList[leftUserid] = newRoom;
+		delete roomList[roomId];
+		delete roomListInfo[roomId];
+        // let newRoom ={
+        //     userList: userList,
+        //     currTurn: 0,
+        //     status : 0,
+        //     start_ack: 0
+        // };
+        // roomList[leftUserid] = newRoom;
 
-        let date = getCurrentDate();
-        let callback = (params) => {
-            let newRoom = {
-                id: leftUserid,
-                creator: {
-                    username: params.username,
-                    rank: params.rank
-                },
-                name: oldName,
-                createdAt: date,
-                status: 0
-            };
-            roomListInfo[socket.id] = newRoom
-            socket.to('global').emit('new-room', newRoom);
-            socket.to(roomId).emit('other-disconnect',newRoom);
-        };
-        userService.getUser(leftUserid, callback);
-
+        // let date = getCurrentDate();
+        // let callback = (params) => {
+        //     let newRoom = {
+        //         id: leftUserid,
+        //         creator: {
+        //             username: params.username,
+        //             rank: params.rank
+        //         },
+        //         name: oldName,
+        //         createdAt: date,
+        //         status: 0
+        //     };
+        //     roomListInfo[socket.id] = newRoom
+        //     socket.to('global').emit('new-room', newRoom);
+        //     socket.to(roomId).emit('other-disconnect',newRoom);
+        // };
+        // userService.getUser(leftUserid, callback);
+        // console.log('LEAVE AND THEN NEW ROOM');
+				// console.log(roomListInfo);
+		socket.to(roomId).emit('other-disconnect', {'oldRoomId': roomId});
         roomId="";
       }
 
@@ -83,6 +88,9 @@ const gameLogic = function(io){
         },500);
 
         socket.on('create-room', (data) => {
+					// if(data.oldRoomId) {
+					// 	socket.leave(data.oldRoomId);
+					// }
             socket.join(socket.id);
             roomId = socket.id;
             let newRoom ={
@@ -93,7 +101,8 @@ const gameLogic = function(io){
             };
             roomList[socket.id] = newRoom;
             socket.emit("room-created", {
-                id: socket.id
+                id: socket.id,
+                name: data.roomName
             });
             console.log(roomList);
             let date = getCurrentDate();
@@ -168,7 +177,8 @@ const gameLogic = function(io){
             };
 
             if (data.gameEnd === 1){
-                roomList[roomId].start_ack = 0;
+								roomList[roomId].start_ack = 0;
+								roomList[roomId].status = 1;
                 msgBody.gameEnd = 1;
                 let winner = roomList[roomId].userList[(roomList[roomId].currTurn + 1) % 2];
                 userService.updateRank(winner,currUser);
@@ -190,6 +200,7 @@ const gameLogic = function(io){
                 io.in(roomId).emit('start-game', {});
             } else {
                 roomList[roomId].start_ack = 1;
+                socket.to(roomId).emit('want-replay', {});
             }
         });
 

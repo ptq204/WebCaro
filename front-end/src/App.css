@@ -84,8 +84,8 @@ body, html {
 .room-list-container-scroll {
   width: 140vmin;
   height: 100vh;
+  overflow: hidden;
   overflow-y: scroll;
-
 }
 
 .container-room-list-user-info {
@@ -125,7 +125,7 @@ body, html {
 
 .room-item-name {
   color: white;
-  font-size: 30px;
+  font-size: 150%;
   padding: 0;
   margin: 0;
   padding-top: 10px;
@@ -133,14 +133,14 @@ body, html {
 
 .room-item-creator {
   color: #C6C2C2;
-  font-size: 20px;
+  font-size: 120%;
   padding: 0;
   margin: 0;
 }
 
 .room-item-created-at {
   color: white;
-  font-size: 15px;
+  font-size: 100%;
 }
 
 .room-item-join-button {
@@ -276,10 +276,25 @@ body, html {
   justify-content: center;
 }
 
+.board-room-name {
+  font-size: 150%;
+  color: #18BC9C;
+  font-weight: bold;
+}
+
 .play-user-info {
   display: flex;
   flex-direction: row;
   width: 40%;
+}
+
+.number-countdown{
+  display: block;
+  font-size: 4em;
+  color: #45ADA8;
+  font-weight: bold;
+  padding: 0;
+  margin: 2px;
 }
 
 .play-opponent-info {

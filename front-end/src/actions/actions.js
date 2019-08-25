@@ -30,6 +30,10 @@ const markGameEnd = (payload) => {
     return {type: 'MARK_GAME_END', payload}
 }
 
+const markStatus = (payload) => {
+    return {type: 'CHANGE_STATUS', payload}
+}
+
 const changeLoginUsername = (payload) => {
     return {type: 'CHANGE_LOGIN_USERNAME', payload}
 }
@@ -59,9 +63,10 @@ module.exports = {
     markTurn: markTurn,
     markTurnNum: markTurnNum,
     markGameEnd: markGameEnd,
+    markStatus: markStatus,
     changeLoginUsername: changeLoginUsername,
     changeLoginPassword: changeLoginPassword,
     setLoggedIn: setLoggedIn,
     changeRegisterUsername: changeRegisterUsername,
-    changeRegisterPassword: changeRegisterPassword
+    changeRegisterPassword: changeRegisterPassword,
 }
