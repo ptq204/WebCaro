@@ -1,5 +1,5 @@
 var roomList = [];
-var roomListInfo = [];
+var roomListInfo = {};
 const userService = require('../service/UserService');
 const secret="pGctNMl4LL4bEQSwCdIzdg";
 const jwt = require('jsonwebtoken');
@@ -72,8 +72,12 @@ const gameLogic = function(io){
         console.log('New user connected');
         socket.join('global');
         console.log(socket.decoded);
-
-        socket.emit('room-list', roomListInfo);
+        
+        setTimeout(()=>{
+            console.log(roomListInfo);
+            socket.emit('room-list', roomListInfo);
+        },500);
+        
         socket.on('create-room', (data) => {
             socket.join(socket.id);
             roomId = socket.id;

@@ -49,7 +49,8 @@ class ConnectedHome extends Component {
         creatorName: data.creator.username,
         creatorRank: data.creator.rank,
         name: data.name,
-        createdAt: data.createdAt
+        createdAt: data.createdAt,
+        status: data.status
       }
       this.props.changeRoomList([...this.props.roomList, newRoom])
     });
@@ -59,6 +60,22 @@ class ConnectedHome extends Component {
       console.log(this.props.currRoom);
       this.props.history.push('/play');
     });
+
+    this.socket.on('room-list', (data) => {
+      console.log('ROOM LIST');
+      let roomList = [];
+      for(var key in data) {
+        roomList.push({
+          id: data[key].id,
+          creatorName: data[key].creator.username,
+          creatorRank: data[key].creator.rank,
+          name: data[key].name,
+          createdAt: data[key].createdAt,
+          status: data[key].status
+        });
+      }
+      this.props.changeRoomList(roomList);
+    })
   }
 
   render() {
@@ -127,7 +144,7 @@ class ConnectedHome extends Component {
         <div style={{ width: "50%" }}>
           <Link to={{ pathname: `/play`, state: { roomId: roomItem.id } }} className="room-item-name">{roomItem.name}</Link>
           <p className="room-item-creator">{roomItem.creatorName}</p>
-          <p className="room-item-created-at">{roomItem.createdAt}</p>
+          <p className="room-item-created-at">{ roomItem.createdAt}</p>
         </div>
         <div className="room-item-join-button">
           <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }} onClick={() => this._joinRoom(roomItem)}>Join</Button>
