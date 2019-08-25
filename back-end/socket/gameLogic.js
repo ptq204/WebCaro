@@ -19,9 +19,6 @@ const gameLogic = function(io){
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
 
-        io.in('global').emit('room-close', {
-            id: roomId
-        });
         if (roomList[roomId].status === 2){
             let winner = (userList.indexOf(socket.id) + 1) % 2;
             userService.updateRank(userList[winner], socket.id);
@@ -32,7 +29,13 @@ const gameLogic = function(io){
         let leftUserid = userList[0];
         let oldName = roomListInfo[roomId].name;
 		delete roomList[roomId];
-		delete roomListInfo[roomId];
+        delete roomListInfo[roomId];
+        
+        io.in('global').emit('room-close', {
+            id: roomId
+        });
+
+        console.log(roomListInfo);
         // let newRoom ={
         //     userList: userList,
         //     currTurn: 0,
@@ -164,7 +167,7 @@ const gameLogic = function(io){
                     });
                     roomList[roomId].currTurn++;
                     console.log('Start at: ' + currUser);
-                }, 2000);
+                }, 5000);
             }
         });
 
