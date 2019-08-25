@@ -342,13 +342,6 @@ class BoardContainer extends Component {
 		let currNumWin = parseInt(numWin.innerHTML);
 		numWin.innerHTML = currNumWin + 1;
 	}
-
-	_countDown = (s) => {
-		num.innerHTML = s;
-		setTimeout(function () {
-			newSec();
-		}, speed);
-	}
 }
 
 const Board = connect(mapStateToProps, mapDispatchToProps)(BoardContainer);
