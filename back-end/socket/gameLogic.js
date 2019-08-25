@@ -12,10 +12,8 @@ const getCurrentDate = () => {
 };
 
 const gameLogic = function(io){
-    let roomId = "";
-
-    const leaveRoom = (socket) => {
-      if  (roomId){
+    const leaveRoom = (socket, roomId) => {
+      if  (roomId) {
         socket.leave(roomId);
         let userList = roomList[roomId].userList;
 
@@ -26,7 +24,7 @@ const gameLogic = function(io){
             let winner = (userList.indexOf(socket.id) + 1) % 2;
             userService.updateRank(userList[winner], socket.id);
         }
-        
+
         let index = userList.indexOf(socket.id);
         userList.slice(index,1);
         let leftUserid = userList[0];
@@ -78,6 +76,7 @@ const gameLogic = function(io){
         }
     })
     .on('connection', (socket) => {
+        let roomId = "";
         console.log('New user connected');
         socket.join('global');
         console.log(socket.decoded);
@@ -209,11 +208,11 @@ const gameLogic = function(io){
         });
 
         socket.on('leave-room', () => {
-             leaveRoom(socket);
+             leaveRoom(socket, roomId);
         });
 
         socket.on(('disconnect'), (reason) => {
-            leaveRoom(socket);
+            leaveRoom(socket, roomId);
             console.log("Disconnenct because " + reason);
         });
     });
