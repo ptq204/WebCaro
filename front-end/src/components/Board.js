@@ -52,7 +52,7 @@ class BoardContainer extends Component {
 				rank: this.props.creatorRank
 			}
 		}
-		
+
 		this.roomId = this.props.roomId;
 		// let data = JSON.parse(getUser(localStorage.getItem('token')));
 		// this.user = data.id;
@@ -62,7 +62,7 @@ class BoardContainer extends Component {
 			query: { token: localStorage.getItem('token') }
 		});
 
-		
+
 	}
 
 	componentDidMount() {
@@ -175,7 +175,7 @@ class BoardContainer extends Component {
 							<div className="board-chat-container" style={{ border: "0", padding: "0" }}>
 								<Col md={7.5} className="board" style={{ padding: "0", border: "0" }}>
 									{
-										(this.props.isGameEnd) ? 
+										(this.props.isGameEnd) ?
 										(
 											<div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
 												<Button onClick={this._replayOnClick}>Play Again</Button>
@@ -277,7 +277,7 @@ class BoardContainer extends Component {
 				}, 500);
 			}
 			// setTimeout(() => {
-				
+
 			// }, 500);
 		}
 	}

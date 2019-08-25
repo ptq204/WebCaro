@@ -31,7 +31,7 @@ module.exports = {
                     );
                     callback(token);
                 });
-            }     
+            }
         });
 
     },
@@ -42,19 +42,23 @@ module.exports = {
                 console.log("not found");
                 callback("Invalid");
             } else {
-                if (bcrypt.compare(inUser.password,user.password)){
-                    let token = jwt.sign(
-                        {id: user.id},
-                        secret,
-                        {expiresIn: '24h'}
-                    );
-                    callback(token);
-                } else {
-                    console.log("wrong pass ");
-                    callback("Invalid");
-                }
+                console.log(inUser.password);
+                console.log(user.password);
+                bcrypt.compare(inUser.password,user.password, (err, res) => {
+                  if (res) {
+                  let token = jwt.sign(
+                      {id: user.id},
+                      secret,
+                      {expiresIn: '24h'}
+                  );
+                  callback(token);
+                  } else {
+                      console.log("wrong pass ");
+                      callback("Invalid");
+                  }
+                });
             }
-        }); 
+        });
     },
     getGameHistory: (usrId, callback)  => {
         UserDAO.findOne({id: usrId}, (err,user) => {
@@ -79,7 +83,7 @@ module.exports = {
             UserDAO.findById(loserId)
         ]).then(([winner, loser])=>{
             console.log(winner,loser);
-            let p1 = 1.0 * 1.0 / (1 + 1.0 * Math.pow(10, 1.0 * (loser.rank - winner.rank) / 4000)); 
+            let p1 = 1.0 * 1.0 / (1 + 1.0 * Math.pow(10, 1.0 * (loser.rank - winner.rank) / 4000));
             let p2 = 1.0 * 1.0 / (1 + 1.0 * Math.pow(10, 1.0 * (winner.rank - loser.rank) / 4000));
             let K = 1500;
             winner.rank = winner.rank + Math.floor(K*(1-p1));
@@ -135,7 +139,7 @@ module.exports = {
                     }));
                     callback(user);
                 });
-            }  
+            }
         });
     },
     setRedisClient: (inClient) => {
