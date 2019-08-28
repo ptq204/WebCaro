@@ -88,11 +88,29 @@ class ConnectedHome extends Component {
       this.props.changeRoomList(roomList);
     });
 
-    this.socket.on('room-close', (data) => {
+    this.socket.on('room-close', async (data) => {
       console.log('ROOM CLOSE ' + data.id);
-      this.props.roomList.splice(this.props.roomList.findIndex(room => room.id === data.id), 1);
-      this.props.changeRoomList(this.props.roomList);
+      let roomList = [...this.props.roomList];
+      await roomList.splice(roomList.findIndex(room => room.id === data.id), 1);
+      //roomList.filter((room,index) => roomList.findIndex(room => room.id === data.id) !== index);
+      this.props.changeRoomList(roomList);
     });
+
+    this.socket.on('room-full', async (data) => {
+      let roomList = [...this.props.roomList];
+      let updateElement = function(rList, id){
+        for(let i = 0; i < rList.length; i++) {
+          if(rList[i].id === id) {
+            rList[i].status = 1;
+            break;
+          }
+        }
+        return rList;
+      }
+      roomList = await updateElement(roomList, data.id);
+      //roomList.filter((room,index) => roomList.findIndex(room => room.id === data.id) !== index);
+      this.props.changeRoomList(roomList);
+    })
 
     window.onclick = function (event) {
       let dialog = document.getElementById('room-name-input-dialog');
@@ -112,8 +130,8 @@ class ConnectedHome extends Component {
             <div id="room-name-input-dialog" className="room-name-input-dialog">
               <div id="room-name-input-dialog-content" className="room-name-input-dialog-content">
                 <Input
-                  style={{minWidth: "80%"}}
-                  action={{content: 'OK', color: 'teal', onClick: () => this._createNewGameRoom(this.props.inputRoomName) }}
+                  style={{ minWidth: "80%" }}
+                  action={{ content: 'OK', color: 'teal', onClick: () => this._createNewGameRoom(this.props.inputRoomName) }}
                   placeholder="Enter room name"
                   onChange={(e) => this._handleChangeInputRoomName(e)}
                 />
@@ -174,7 +192,7 @@ class ConnectedHome extends Component {
 
   _renderRoomItem = (roomItem, i) => {
     return (
-      <div className="room-item">
+      <div key={i} className="room-item">
         <div style={{ width: "80%", display: "flex", alignItems: "center" }}>
           <div>
             <Popup trigger={<Link to={{ pathname: `/play`, state: { roomId: roomItem.id } }} className="room-item-name">{roomItem.name}</Link>}>
@@ -185,7 +203,12 @@ class ConnectedHome extends Component {
           </div>
         </div>
         <div className="room-item-join-button">
+        {
+          (roomItem.status === 0) ?
           <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }} onClick={() => this._joinRoom(roomItem)}>Join</Button>
+          :
+          <Button style={{ backgroundColor: "#858f8c", border: "solid #858f8c" }} onClick={() => this._joinRoom(roomItem)}>Live</Button>
+        }
         </div>
       </div>
     );
