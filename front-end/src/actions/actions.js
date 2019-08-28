@@ -62,6 +62,10 @@ const changeInputRoomName = (payload) => {
     return {type: 'CHANGE_INPUT_ROOM_NAME', payload}
 }
 
+const markWatchLive = (payload) => {
+    return {type: 'MARK_WATCH_LIVE', payload}
+}
+
 module.exports = {
     changeRoomList: changeRoomList,
     getUserInfo: getUserInfo,
@@ -78,5 +82,6 @@ module.exports = {
     changeRegisterUsername: changeRegisterUsername,
     changeRegisterPassword: changeRegisterPassword,
     changeInputRoomName: changeInputRoomName,
-    changeRankList: changeRankList
+    changeRankList: changeRankList,
+    markWatchLive: markWatchLive
 }

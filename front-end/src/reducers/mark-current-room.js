@@ -10,7 +10,8 @@ const initialState = {
     currTurn: -1,
     isGameEnd: false,
     status: 0,
-    name: ''
+    name: '',
+    watchLive: false
 }
 
 const currRoomReducer = (state = initialState, action) => {
@@ -25,7 +26,7 @@ const currRoomReducer = (state = initialState, action) => {
             currTurn: -1,
             isGameEnd: false,
             status: 0,
-            name: action.payload.name
+            name: action.payload.name,
         });
     }
     else if(action.type === 'MARK_GAME_START') {
@@ -56,6 +57,11 @@ const currRoomReducer = (state = initialState, action) => {
     else if(action.type === 'CHANGE_STATUS') {
         return Object.assign({} , state, {
             status: action.payload
+        });
+    }
+    else if(action.type === 'MARK_WATCH_LIVE') {
+        return Object.assign({} , state, {
+            watchLive: action.payload
         });
     }
     return state;

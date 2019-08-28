@@ -6,6 +6,7 @@ import loginReducer from './change-login';
 import registerReducer from './change-register';
 import inputRoomNameReducer from './change-input-room-name';
 import rankListReducer from './change-rank-list';
+import watchLiveReducer from './mark-watch-live';
 
 const reducers = combineReducers({
     changeRoomList: roomListReducer,
@@ -14,7 +15,8 @@ const reducers = combineReducers({
     login: loginReducer,
     register: registerReducer,
     inputRoomName: inputRoomNameReducer,
-    ranks: rankListReducer
+    ranks: rankListReducer,
+    markWatchLive: watchLiveReducer
 });
 
 export default reducers;

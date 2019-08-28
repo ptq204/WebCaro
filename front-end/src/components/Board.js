@@ -24,7 +24,8 @@ const mapStateToProps = state => {
 		creatorName: state.markCurrentRoom.creatorName,
 		creatorRank: state.markCurrentRoom.creatorRank,
 		status: state.markCurrentRoom.status,
-		name: state.markCurrentRoom.name
+		name: state.markCurrentRoom.name,
+		watchLive: state.markWatchLive.watchLive
 	}
 }
 
@@ -51,31 +52,32 @@ class BoardContainer extends Component {
 		// }'
 		let currUser = JSON.parse(getUser(localStorage.getItem('token')));
 		this.user = currUser.id;
+		this.roomId = this.props.roomId;
+		this.socket = io(SERVER_URL, {
+			query: { token: localStorage.getItem('token') }
+		});
 
 		this.opponent = null;
-		if (this.props.creatorName !== undefined && this.props.username !== this.props.creatorName) {
+		// If you are player and creator name >< your username => opponent is creator
+		if (this.props.creatorName !== undefined && this.props.username !== this.props.creatorName && !this.props.watchLive) {
 			this.opponent = {
 				username: this.props.creatorName,
 				rank: this.props.creatorRank
 			}
 		}
 
-		this.roomId = this.props.roomId;
+		if (this.props.watchLive) {
+			this.socket.emit('query-opponent', { 'roomId': this.roomId });
+		}
 		// let data = JSON.parse(getUser(localStorage.getItem('token')));
 		// this.user = data.id;
 		// console.log(data.id);
-
-		this.socket = io(SERVER_URL, {
-			query: { token: localStorage.getItem('token') }
-		});
-
-
 	}
 
 	componentDidMount() {
 		this.socket.on('start-game', (data) => {
 			console.log('Emit game ack');
-			if (this.opponent === null) {
+			if (this.opponent === null && !this.props.watchLive) {
 				this.opponent = {
 					username: data.joining.username,
 					rank: data.joining.rank
@@ -86,8 +88,10 @@ class BoardContainer extends Component {
 		});
 
 		this.socket.on('start-playing', (data) => {
-			this.props.markGameStart();
-			this.props.markStatus(2);
+			if (!this.props.isGameStarted) {
+				this.props.markGameStart();
+				this.props.markStatus(2);
+			}
 		})
 
 		this.socket.on('turn', (data) => {
@@ -112,7 +116,7 @@ class BoardContainer extends Component {
 						console.log('You go first');
 					}
 				}
-				else {
+				else if (!this.props.watchLive) {
 					turnMark = true;
 				}
 				// this.timeOut = setTimeout(() => {
@@ -147,6 +151,16 @@ class BoardContainer extends Component {
 			}
 			this.props.markCurrentRoom(newRoom);
 		});
+
+		// If watch live => need to get information of creator's opponent
+		this.socket.on('opponent-live', (data) => {
+			if (this.opponent === null && this.props.watchLive) {
+				this.opponent = {
+					username: data.username,
+					rank: data.rank
+				}
+			}
+		});
 	}
 	// componentDidMount() {
 	// 	this.socket.emit('join', { 'roomId': this.roomId, 'user': this.user });
@@ -165,10 +179,10 @@ class BoardContainer extends Component {
 									<div id="play-user-info" className="play-user-info">
 										<img style={{ height: "80%" }} src={getRankBadge(this.props.userrank)}></img>
 										<div>
-											<p className="play-game-username">{this.props.username}</p>
+											<p className="play-game-username">{this.props.creatorName}</p>
 											<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
 												<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-												<p className="play-game-userrank">{this.props.userrank}</p>
+												<p className="play-game-userrank">{this.props.creatorRank}</p>
 											</div>
 										</div>
 									</div>
@@ -180,13 +194,13 @@ class BoardContainer extends Component {
 										(this.opponent !== null) ?
 											<div id="play-opponent-info" className="play-opponent-info">
 												<div>
-													<p className="play-game-username">{this.opponent.username}</p>
+													<p className="play-game-username">{ this._decideOpponentInfo('name') }</p>
 													<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
 														<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-														<p className="play-game-userrank">{this.opponent.rank}</p>
+														<p className="play-game-userrank">{ this._decideOpponentInfo('rank') }</p>
 													</div>
 												</div>
-												<img style={{ height: "80%" }} src={getRankBadge(this.opponent.rank)}></img>
+												<img style={{ height: "80%" }} src={getRankBadge(this._decideOpponentInfo('rank'))}></img>
 											</div>
 											:
 											<div id="play-opponent-info-waiting" className="play-opponent-info">
@@ -341,6 +355,37 @@ class BoardContainer extends Component {
 		let numWin = document.getElementById(id);
 		let currNumWin = parseInt(numWin.innerHTML);
 		numWin.innerHTML = currNumWin + 1;
+	}
+
+	_decideOpponentInfo = (field) => {
+		let info = null;
+		if(field === 'name') {
+			if(this.props.username !== this.props.creatorName) {
+				if(this.props.watchLive) {
+					info = this.opponent.username;
+				}
+				else {
+					info = this.props.username;
+				}
+			}
+			else {
+				info = this.opponent.username;
+			}
+		}
+		else if(field === 'rank') {
+			if(this.props.username !== this.props.creatorName) {
+				if(this.props.watchLive) {
+					info = this.opponent.rank;
+				}
+				else {
+					info = this.props.userrank;
+				}
+			}
+			else {
+				info = this.opponent.rank;
+			}
+		}
+		return info;
 	}
 }
 
