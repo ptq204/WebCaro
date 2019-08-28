@@ -7,7 +7,7 @@ import { gameRooms, userInformation } from '../mock/data';
 import { getRankBadge } from '../helper/helper';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
-import { changeRoomList, getUserInfo, markCurrentRoom, changeInputRoomName } from '../actions/actions';
+import { changeRoomList, getUserInfo, markCurrentRoom, changeInputRoomName, markWatchLive } from '../actions/actions';
 import { SERVER_URL } from '../config/config';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
@@ -18,7 +18,8 @@ const mapStateToProps = state => {
     roomList: state.changeRoomList.roomList,
     userInfo: state.getUserInfo.user,
     currRoom: state.markCurrentRoom.roomId,
-    inputRoomName: state.inputRoomName.roomName
+    inputRoomName: state.inputRoomName.roomName,
+    watchLive: state.markWatchLive.watchLive
   }
 }
 
@@ -27,7 +28,8 @@ const mapDispatchToProps = (disPatch) => {
     changeRoomList: roomList => disPatch(changeRoomList(roomList)),
     getUserInfo: user => disPatch(getUserInfo(user)),
     markCurrentRoom: roomItem => disPatch(markCurrentRoom(roomItem)),
-    changeInputRoomName: roomName => disPatch(changeInputRoomName(roomName))
+    changeInputRoomName: roomName => disPatch(changeInputRoomName(roomName)),
+    markWatchLive: watchLive => disPatch(markWatchLive(watchLive))
   }
 }
 
@@ -207,7 +209,7 @@ class ConnectedHome extends Component {
           (roomItem.status === 0) ?
           <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }} onClick={() => this._joinRoom(roomItem)}>Join</Button>
           :
-          <Button style={{ backgroundColor: "#858f8c", border: "solid #858f8c" }} onClick={() => this._joinRoom(roomItem)}>Live</Button>
+          <Button style={{ backgroundColor: "#858f8c", border: "solid #858f8c" }} onClick={() => this._watchLiveRoom(roomItem)}>Live</Button>
         }
         </div>
       </div>
@@ -244,6 +246,13 @@ class ConnectedHome extends Component {
 
   _joinRoom = (roomItem) => {
     this.props.markCurrentRoom(roomItem);
+    this.socket.emit('join', { 'roomId': roomItem.id });
+    this.props.history.push('/play');
+  }
+
+  _watchLiveRoom = (roomItem) => {
+    this.props.markCurrentRoom(roomItem);
+    this.props.markWatchLive(true);
     this.socket.emit('join', { 'roomId': roomItem.id });
     this.props.history.push('/play');
   }
