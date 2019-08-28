@@ -185,6 +185,12 @@ class BoardContainer extends Component {
 												<p className="play-game-userrank">{this.props.creatorRank}</p>
 											</div>
 										</div>
+										{
+											(this._decideTurnAnimation()) ?
+												<div class="lds-dual-ring" style={{ marginLeft: "10px" }}></div>
+												:
+												<div></div>
+										}
 									</div>
 									<div className="match-ratio">
 										<p id="user-num-win" style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
@@ -193,18 +199,24 @@ class BoardContainer extends Component {
 									{
 										(this.opponent !== null) ?
 											<div id="play-opponent-info" className="play-opponent-info">
+												{
+													(this.props.isGameStarted && !this.props.isGameEnd && !this._decideTurnAnimation()) ?
+														<div class="lds-dual-ring" style={{ marginLeft: "10px" }}></div>
+														:
+														<div></div>
+												}
 												<div>
-													<p className="play-game-username">{ this._decideOpponentInfo('name') }</p>
+													<p className="play-game-username">{this._decideOpponentInfo('name')}</p>
 													<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
 														<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-														<p className="play-game-userrank">{ this._decideOpponentInfo('rank') }</p>
+														<p className="play-game-userrank">{this._decideOpponentInfo('rank')}</p>
 													</div>
 												</div>
 												<img style={{ height: "80%" }} src={getRankBadge(this._decideOpponentInfo('rank'))}></img>
 											</div>
 											:
 											<div id="play-opponent-info-waiting" className="play-opponent-info">
-												<p style={{ float: "right" }}>Waiting...</p>
+												<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
 											</div>
 									}
 								</div>
@@ -359,9 +371,9 @@ class BoardContainer extends Component {
 
 	_decideOpponentInfo = (field) => {
 		let info = null;
-		if(field === 'name') {
-			if(this.props.username !== this.props.creatorName) {
-				if(this.props.watchLive) {
+		if (field === 'name') {
+			if (this.props.username !== this.props.creatorName) {
+				if (this.props.watchLive) {
 					info = this.opponent.username;
 				}
 				else {
@@ -372,9 +384,9 @@ class BoardContainer extends Component {
 				info = this.opponent.username;
 			}
 		}
-		else if(field === 'rank') {
-			if(this.props.username !== this.props.creatorName) {
-				if(this.props.watchLive) {
+		else if (field === 'rank') {
+			if (this.props.username !== this.props.creatorName) {
+				if (this.props.watchLive) {
 					info = this.opponent.rank;
 				}
 				else {
@@ -386,6 +398,31 @@ class BoardContainer extends Component {
 			}
 		}
 		return info;
+	}
+
+	_decideTurnAnimation = () => {
+		let check = false;
+		if (this.props.isGameStarted && !this.props.isGameEnd) {
+			if (this.props.username === this.props.creatorName) {
+				if (this.props.isYourTurn) {
+					check = true;
+				}
+			}
+			else if (this.props.watchLive) {
+				if(this.props.currTurn % 2 === 0) {
+					check = true;
+				}
+			}
+			else if (!this.props.isYourTurn) {
+				check = true;
+			}
+		}
+		// else {
+		// 	if (this.props.isGameStarted && !this.props.isGameEnd && this.props.isYourTurn && this.props.creatorName !== this.props.username) {
+		// 		check = true;
+		// 	}
+		// }
+		return check;
 	}
 }
 
