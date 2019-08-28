@@ -136,7 +136,7 @@ class BoardContainer extends Component {
 			if (this.props.status === 2) {
 				this._updateNumWinOfPlayer('user-num-win');
 			}
-			this.socket.emit('create-room', { 'oldRoomId': data.oldRoomId, 'roomName': 'New room' });
+			this.socket.emit('create-room', { 'oldRoomId': data.oldRoomId, 'roomName': this.props.name });
 			let newRoom = {
 				id: this.user,
 				creatorName: this.props.username,
@@ -158,7 +158,7 @@ class BoardContainer extends Component {
 			<div className="background-img">
 				<div className="background-color-effect-dark">
 					<NavCustom></NavCustom>
-					<div style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", alignContent: "center" }}>
+					<div style={{ height: "100vh", width: "100%" }} className="board-body-container">
 						<Card className="play-game-container" style={{ width: "140vmin", "height": "86vh" }}>
 							<div className="opponent-time-progress-container">
 								<div style={{ height: "22vmin", width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-end" }}>
@@ -176,23 +176,23 @@ class BoardContainer extends Component {
 										<p id="user-num-win" style={{ color: "#383834", fontSize: "200%", marginRight: "10%" }}>0</p>
 										<p id="opponent-num-win" style={{ color: "#383834", fontSize: "200%" }}>0</p>
 									</div>
-									<div style={{ width: "40%", display: "flex", justifyContent: "flex-end" }}>
-										{
-											(this.opponent !== null) ?
-												<div id="play-opponent-info" className="play-opponent-info">
-													<div>
-														<p className="play-game-username">{this.opponent.username}</p>
-														<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-															<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
-															<p className="play-game-userrank">{this.opponent.rank}</p>
-														</div>
+									{
+										(this.opponent !== null) ?
+											<div id="play-opponent-info" className="play-opponent-info">
+												<div>
+													<p className="play-game-username">{this.opponent.username}</p>
+													<div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+														<img style={{ height: "4vmin" }} src="/images/rank-logo.png"></img>
+														<p className="play-game-userrank">{this.opponent.rank}</p>
 													</div>
-													<img style={{ height: "80%" }} src={getRankBadge(this.opponent.rank)}></img>
 												</div>
-												:
-												<p>Waiting...</p>
-										}
-									</div>
+												<img style={{ height: "80%" }} src={getRankBadge(this.opponent.rank)}></img>
+											</div>
+											:
+											<div id="play-opponent-info-waiting" className="play-opponent-info">
+												<p style={{ float: "right" }}>Waiting...</p>
+											</div>
+									}
 								</div>
 								<Progress id="progress-bar" style={{ width: "100%" }} percent={45} color="teal" size="small" />
 							</div>
@@ -333,7 +333,7 @@ class BoardContainer extends Component {
 	}
 
 	_leaveRoom = () => {
-		this.socket.emit('leave-room', {id: this.props.roomId});
+		this.socket.emit('leave-room', { id: this.props.roomId });
 		this.props.history.push('/');
 	}
 

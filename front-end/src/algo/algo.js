@@ -38,12 +38,16 @@ const checkWin = (m, i, j, move) => {
     return false;
 }
 
+const isValidCell = (row, col, i, j) => {
+    return (i >= 0 && i < row && j >= 0 && j < col);
+}
+
 const checkSequence = (m, i, j, move, direction) => {
     let row = i + direction[0];
     let col = j + direction[1];
     let cnt = 1;
     while(1) {
-        if(m[row][col].move === move) {
+        if(isValidCell(m.length, m[0].length, row, col) && m[row][col].move === move) {
             cnt++;
             if(cnt === 5) {
                 return true;
@@ -56,7 +60,7 @@ const checkSequence = (m, i, j, move, direction) => {
     row = i - direction[0];
     col = j - direction[1];
     while(1) {
-        if(m[row][col].move === move) {
+        if(isValidCell(m.length, m[0].length, row, col) && m[row][col].move === move) {
             cnt++;
             if(cnt === 5) {
                 return true;

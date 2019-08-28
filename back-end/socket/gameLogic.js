@@ -135,6 +135,7 @@ const gameLogic = function(io){
 
             roomList[roomId].userList.push(socket.id);
             roomList[roomId].status = 1;
+            roomListInfo[roomId].status = 1;
 
             console.log(roomList[roomId].userList);
 
@@ -159,6 +160,7 @@ const gameLogic = function(io){
             console.log(roomList[roomId].start_ack);
             if (roomList[roomId].start_ack === 2){
                 roomList[roomId].status = 2;
+                roomListInfo[roomId].status = 2;
                 roomList[roomId].currTurn = Math.floor((Math.random() * 2));
                 let currUser = roomList[roomId].userList[roomList[roomId].currTurn % 2];
                 io.in(roomId).emit('start-playing', {'message': 'PLAY DI'});
