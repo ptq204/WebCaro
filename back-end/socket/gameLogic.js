@@ -13,8 +13,9 @@ const getCurrentDate = () => {
 
 const gameLogic = function (io) {
 	let roomId = "";
-	const leaveRoom = (socket, roomId) => {
-		if (roomId) {
+	const leaveRoom = (socket, data) => {
+		let roomId = data.id;
+		if (roomId && !data.watchLive) {
 			console.log('LEAVING ' + roomId);
 			socket.leave(roomId);
 			let userList = roomList[roomId].userList;
@@ -234,7 +235,7 @@ const gameLogic = function (io) {
 
 			socket.on('leave-room', (data) => {
 				console.log('LEAVEEEE ' + data.id);
-				leaveRoom(socket, data.id);
+				leaveRoom(socket, data);
 			});
 
 			socket.on(('disconnect'), (reason) => {
