@@ -112,7 +112,23 @@ class ConnectedHome extends Component {
       roomList = await updateElement(roomList, data.id);
       //roomList.filter((room,index) => roomList.findIndex(room => room.id === data.id) !== index);
       this.props.changeRoomList(roomList);
-    })
+    });
+
+    this.socket.on('room-start-playing', async (data) => {
+      let roomList = [...this.props.roomList];
+      let updateElement = function(rList, id){
+        for(let i = 0; i < rList.length; i++) {
+          if(rList[i].id === id) {
+            rList[i].status = 2;
+            break;
+          }
+        }
+        return rList;
+      }
+      roomList = await updateElement(roomList, data.id);
+      //roomList.filter((room,index) => roomList.findIndex(room => room.id === data.id) !== index);
+      this.props.changeRoomList(roomList);
+    });
 
     window.onclick = function (event) {
       let dialog = document.getElementById('room-name-input-dialog');
@@ -209,7 +225,11 @@ class ConnectedHome extends Component {
           (roomItem.status === 0) ?
           <Button style={{ backgroundColor: "#18BC9C", border: "solid #18BC9C" }} onClick={() => this._joinRoom(roomItem)}>Join</Button>
           :
-          <Button style={{ backgroundColor: "#858f8c", border: "solid #858f8c" }} onClick={() => this._watchLiveRoom(roomItem)}>Live</Button>
+          ((roomItem.status === 2) ?
+            <Button style={{ backgroundColor: "#858f8c", border: "solid #858f8c" }} onClick={() => this._watchLiveRoom(roomItem)}>Live</Button>
+            :
+            <div></div>
+          )
         }
         </div>
       </div>
@@ -247,6 +267,7 @@ class ConnectedHome extends Component {
   _joinRoom = (roomItem) => {
     this.props.markCurrentRoom(roomItem);
     this.socket.emit('join', { 'roomId': roomItem.id });
+    this.props.markWatchLive(false);
     this.props.history.push('/play');
   }
 

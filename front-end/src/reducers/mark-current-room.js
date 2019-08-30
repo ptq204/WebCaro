@@ -11,7 +11,6 @@ const initialState = {
     isGameEnd: false,
     status: 0,
     name: '',
-    watchLive: false
 }
 
 const currRoomReducer = (state = initialState, action) => {
@@ -57,11 +56,6 @@ const currRoomReducer = (state = initialState, action) => {
     else if(action.type === 'CHANGE_STATUS') {
         return Object.assign({} , state, {
             status: action.payload
-        });
-    }
-    else if(action.type === 'MARK_WATCH_LIVE') {
-        return Object.assign({} , state, {
-            watchLive: action.payload
         });
     }
     return state;

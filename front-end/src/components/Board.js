@@ -105,6 +105,9 @@ class BoardContainer extends Component {
 				this._updateNumWinOfPlayer('opponent-num-win');
 				setTimeout(() => {
 					this.props.markGameEnd(true);
+					if (this.props.watchLive) {
+						this.props.history.push('/');
+					}
 					console.log('GAME END FROM SERVER');
 				}, 500);
 
@@ -140,16 +143,21 @@ class BoardContainer extends Component {
 			if (this.props.status === 2) {
 				this._updateNumWinOfPlayer('user-num-win');
 			}
-			this.socket.emit('create-room', { 'oldRoomId': data.oldRoomId, 'roomName': this.props.name });
-			let newRoom = {
-				id: this.user,
-				creatorName: this.props.username,
-				creatorRank: this.props.userrank,
-				name: 'New room',
-				createdAt: new Date(),
-				status: 0
+			if (this.props.watchLive) {
+				this.props.history.push('/');
 			}
-			this.props.markCurrentRoom(newRoom);
+			else {
+				this.socket.emit('create-room', { 'oldRoomId': data.oldRoomId, 'roomName': this.props.name });
+				let newRoom = {
+					id: this.user,
+					creatorName: this.props.username,
+					creatorRank: this.props.userrank,
+					name: 'New room',
+					createdAt: new Date(),
+					status: 0
+				}
+				this.props.markCurrentRoom(newRoom);
+			}
 		});
 
 		// If watch live => need to get information of creator's opponent
@@ -359,7 +367,11 @@ class BoardContainer extends Component {
 	}
 
 	_leaveRoom = () => {
-		this.socket.emit('leave-room', { id: this.props.roomId });
+		let msgBody = {id: this.props.roomId};
+		if(this.props.watchLive) {
+			msgBody.watchLive = true;
+		}
+		this.socket.emit('leave-room', msgBody);
 		this.props.history.push('/');
 	}
 
@@ -409,7 +421,7 @@ class BoardContainer extends Component {
 				}
 			}
 			else if (this.props.watchLive) {
-				if(this.props.currTurn % 2 === 0) {
+				if (this.props.currTurn % 2 === 0) {
 					check = true;
 				}
 			}
