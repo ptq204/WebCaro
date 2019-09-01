@@ -50,6 +50,10 @@ class BoardContainer extends Component {
 		// 	isYourTurn: false,
 		// 	currTurn: null
 		// }'
+		this.state = {
+			inputChatMesage: ''
+		}
+
 		let currUser = JSON.parse(getUser(localStorage.getItem('token')));
 		this.user = currUser.id;
 		this.roomId = this.props.roomId;
@@ -169,6 +173,12 @@ class BoardContainer extends Component {
 				}
 			}
 		});
+
+		this.socket.on('display-message', (data) => {
+			if(!this.props.watchLive) {
+				this._displayChatMessage(data.msg, 'opponent');
+			}
+		});
 	}
 	// componentDidMount() {
 	// 	this.socket.emit('join', { 'roomId': this.roomId, 'user': this.user });
@@ -264,18 +274,25 @@ class BoardContainer extends Component {
 											</Card.Header>
 										</Card.Content>
 										<div className="chat-layout-container">
-											<div className="chat-layout">
+											<div className="chat-layout" id="chat-layout">
 											</div>
-											<InputGroup style={{ marginTop: "2vmin" }} className="mb-3 chat-input">
-												<FormControl
-													placeholder="chat here"
-													aria-label="chat here"
-													aria-describedby="basic-addon2"
-												/>
-												<InputGroup.Append>
-													<Button variant="primary">Send</Button>
-												</InputGroup.Append>
-											</InputGroup>
+											{
+												(!this.props.watchLive) ?
+													<InputGroup style={{ marginTop: "2vmin" }} className="mb-3 chat-input">
+														<FormControl
+															placeholder="chat here"
+															aria-label="chat here"
+															aria-describedby="basic-addon2"
+															onChange={(e) => this._handleInputChatMessageChange(e)}
+															value={this.state.inputChatMesage}
+														/>
+														<InputGroup.Append>
+															<Button variant="primary" onClick={this._sendChatMessage}>Send</Button>
+														</InputGroup.Append>
+													</InputGroup>
+													:
+													<div></div>
+											}							
 										</div>
 									</Card>
 								</Col>
@@ -435,6 +452,35 @@ class BoardContainer extends Component {
 		// 	}
 		// }
 		return check;
+	}
+
+	_sendChatMessage = () => {
+		this.socket.emit('chat', {'msg': this.state.inputChatMesage});
+		this._displayChatMessage(this.state.inputChatMesage, 'you');
+		this.setState({
+			inputChatMesage: ''
+		});
+	}
+
+	_handleInputChatMessageChange = (e) => {
+		this.setState({
+			inputChatMesage: e.target.value
+		});
+	}
+
+	_displayChatMessage = (message, user) => {
+		let chatLayout = document.getElementById('chat-layout');
+		let chatContent = document.createElement('p');
+		chatContent.innerHTML = message;
+		let chatItem = document.createElement('div');
+		if(user === 'you') {
+			chatItem.className = 'chat-item-user';
+		}
+		else {
+			chatItem.className = 'chat-item';
+		}
+		chatItem.appendChild(chatContent);
+		chatLayout.appendChild(chatItem);
 	}
 }
 

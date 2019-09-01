@@ -358,6 +358,7 @@ body, html {
   background-color: #C4C4C4;
   height: 80%;
   width: 100%;
+  overflow: scroll;
 }
 
 .chat-input {
@@ -374,6 +375,32 @@ body, html {
   color: #0398fc;
   font-size: 20px;
   font-family: 'Nunito', sans-serif;
+}
+
+.chat-item {
+  background-color: #8e9faa;
+  border-radius: 10px;
+  color: azure;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  padding: 10px;
+  margin: 10px;
+  max-width: 90%;
+  float: left;
+  clear: both;
+}
+
+.chat-item-user {
+  background-color: #0398fc;
+  border-radius: 10px;
+  color: black;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  padding: 10px;
+  margin: 10px;
+  max-width: 90%;
+  float: right;
+  clear: both;
 }
 
 

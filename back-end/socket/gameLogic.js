@@ -195,9 +195,11 @@ const gameLogic = function (io) {
 					msgBody.gameEnd = 1;
 					let winner = roomList[roomId].userList[(roomList[roomId].currTurn + 1) % 2];
 					userService.updateRank(winner, currUser);
-					socket.to('global').emit('room-full', {
-						id: roomId
-					});
+					setTimeout(() => {
+						socket.to('global').emit('room-full', {
+							id: roomId
+						});
+					}, 500);
 				}
 				else {
 					msgBody.gameEnd = 0;
@@ -217,7 +219,7 @@ const gameLogic = function (io) {
 					});
 				}
 				userService.getUser(opponentId, callback);
-			})
+			});
 
 			socket.on('replay', (data) => {
 				if (roomList[roomId].start_ack === 1) {
@@ -230,7 +232,7 @@ const gameLogic = function (io) {
 			});
 
 			socket.on('chat', (data) => {
-				socket.to(roomId).emit('chat', data.msg);
+				socket.to(roomId).emit('display-message', {'msg': data.msg});
 			});
 
 			socket.on('leave-room', (data) => {
