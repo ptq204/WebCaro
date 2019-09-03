@@ -3,8 +3,8 @@ import { updateBoard, checkWin, createMap } from '../algo/algo';
 import Cell from './Cell';
 import io from 'socket.io-client';
 import NavCustom from './NavCustom';
-import { Col, ProgressBar, Button, InputGroup, FormControl } from 'react-bootstrap';
-import { Card, Image, Progress } from 'semantic-ui-react';
+import { Col, ProgressBar, Button, InputGroup, FormControl, Form } from 'react-bootstrap';
+import { Card, Image, Progress, Input } from 'semantic-ui-react';
 import { getRankBadge } from '../helper/helper';
 import { SERVER_URL } from '../config/config';
 import { markGameStart, updateBoardState, markTurn, markTurnNum, markGameEnd, markCurrentRoom, markStatus } from '../actions/actions';
@@ -278,18 +278,15 @@ class BoardContainer extends Component {
 											</div>
 											{
 												(!this.props.watchLive) ?
-													<InputGroup style={{ marginTop: "2vmin" }} className="mb-3 chat-input">
-														<FormControl
+													<Form style={{ marginTop: "2vmin" }} className="mb-3 chat-input">
+														<Input
+															style={{ maxWidth: "70%" }}
+															action={{ content: 'Send', color: 'teal', onClick: (e) => this._sendChatMessage(e) }}
 															placeholder="chat here"
-															aria-label="chat here"
-															aria-describedby="basic-addon2"
 															onChange={(e) => this._handleInputChatMessageChange(e)}
-															value={this.state.inputChatMesage}
+															value={ this.state.inputChatMesage }
 														/>
-														<InputGroup.Append>
-															<Button variant="primary" onClick={this._sendChatMessage}>Send</Button>
-														</InputGroup.Append>
-													</InputGroup>
+													</Form>
 													:
 													<div></div>
 											}							
@@ -454,7 +451,8 @@ class BoardContainer extends Component {
 		return check;
 	}
 
-	_sendChatMessage = () => {
+	_sendChatMessage = (e) => {
+		e.preventDefault();
 		this.socket.emit('chat', {'msg': this.state.inputChatMesage});
 		this._displayChatMessage(this.state.inputChatMesage, 'you');
 		this.setState({

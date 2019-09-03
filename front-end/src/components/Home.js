@@ -148,12 +148,14 @@ class ConnectedHome extends Component {
             <NavCustom></NavCustom>
             <div id="room-name-input-dialog" className="room-name-input-dialog">
               <div id="room-name-input-dialog-content" className="room-name-input-dialog-content">
-                <Input
-                  style={{ minWidth: "80%" }}
-                  action={{ content: 'OK', color: 'teal', onClick: () => this._createNewGameRoom(this.props.inputRoomName) }}
-                  placeholder="Enter room name"
-                  onChange={(e) => this._handleChangeInputRoomName(e)}
-                />
+                <Form style={{ minWidth: "80%" }}>
+                  <Input
+                    style={{ minWidth: "100%" }}
+                    action={{ content: 'OK', color: 'teal', onClick: (e) => this._createNewGameRoom(e, this.props.inputRoomName) }}
+                    placeholder="Enter room name"
+                    onChange={(e) => this._handleChangeInputRoomName(e)}
+                  />
+                </Form>
               </div>
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
@@ -239,7 +241,8 @@ class ConnectedHome extends Component {
   }
 
   // Create new room ('create-room', {roomName: String})
-  _createNewGameRoom = (roomName) => {
+  _createNewGameRoom = (e, roomName) => {
+    e.preventDefault();
     this.props.changeInputRoomName('');
     this.socket.emit('create-room', { 'roomName': roomName });
   }
