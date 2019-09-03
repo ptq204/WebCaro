@@ -150,6 +150,13 @@ Winner: UserId-id
 }
 ```  
 
+## **Logic**  
+
+Update event:  
+- When room is full (status = 1) => server emit event 'room-full' => display 'Live' button for that room.   
+- 'game_ack': server emit 'room-start-playing' to display button 'Live'.  
+- When watch live => need only to query information (username, rank) of "opponent" because we already have that information of creator. client emit event 'query-opponent' and then catch the event 'opponent-live' from server.  
+- If game end => server emit event 'room-full'
 
 ## **User interface**  
 
