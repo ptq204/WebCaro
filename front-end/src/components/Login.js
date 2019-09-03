@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { changeLoginPassword, changeLoginUsername, setLoggedIn } from '../actions/actions';
+import { changeLoginPassword, changeLoginUsername, setLoggedIn, setLogOut } from '../actions/actions';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import { SERVER_URL } from '../config/config';
+import { Redirect } from 'react-router-dom';
 
 const mapStateToProps = state => {
 	return {
 		username: state.login.username,
 		password: state.login.password,
-		isLoggedIn: state.login.isLoggedIn
+		isLoggedIn: state.login.isLoggedIn,
+		isLoggedOut: state.setLogOut.isLoggedOut
 	}
 }
 
@@ -18,14 +20,19 @@ const mapDispatchToProps = disPatch => {
 	return {
 		handleChangeUsername: username => disPatch(changeLoginUsername(username)),
 		handleChangePassword: password => disPatch(changeLoginPassword(password)),
-		setLoggedIn: isLoggedIn => disPatch(setLoggedIn(isLoggedIn))
+		setLoggedIn: isLoggedIn => disPatch(setLoggedIn(isLoggedIn)),
+		setLogOut: isLoggedOut => disPatch(setLogOut(isLoggedOut))
 	}
 }
 
 class LoginContainer extends Component {
+
+	state = {
+		errMessage: ''
+	}
 	render() {
-		if(this.props.isLoggedIn) {
-			this.props.history.push('/');
+		if(this.props.isLoggedIn && !this.props.isLoggedOut) {
+			return <Redirect to="/"></Redirect>
 		}
 		return (
 			<div className="background-img">
@@ -45,13 +52,13 @@ class LoginContainer extends Component {
 											<Form.Control type="password" placeholder="Password" onChange={(e) => this.props.handleChangePassword(e.target.value)} />
 										</Form.Group>
 									</div>
+									<div style={{ display: "flex", justifyContent: "center" }}>
+										<Button variant="primary" type="submit" onClick={this._login} style={{ width: "150px", backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>
+											Login
+									</Button>
+									</div>
 								</Form>
-							</div>
-							<div style={{ display: "flex", justifyContent: "center" }}>
-								<Button variant="primary" type="submit" onClick={this._login} style={{ width: "150px", backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>
-									Login
-  						</Button>
-							</div>
+							</div>				
 							<Link to="/register" style={{ color: "white", fontSize: "15px", display: "flex", justifyContent: "center" }}>
 								Create new account
 						</Link>
@@ -62,7 +69,8 @@ class LoginContainer extends Component {
 		);
 	}
 
-	_login = () => {
+	_login = (e) => {
+		e.preventDefault();
 		let params = new URLSearchParams();
 		params.append('username', this.props.username);
 		params.append('password', this.props.password);
@@ -77,6 +85,7 @@ class LoginContainer extends Component {
 				if(data.token && data.token !== ''){
 					localStorage.setItem('token', data.token);
 					this.props.setLoggedIn(true);
+					this.props.setLogOut(false);
 				}
 			}
 		}).catch(err => {

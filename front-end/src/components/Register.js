@@ -21,6 +21,10 @@ const mapDispatchToProps = disPatch => {
 }
 
 class RegisterContainer extends Component {
+	state = {
+		errMessage: ''
+	}
+
 	render() {
 		if (this.props.isLoggedIn) {
 			this.props.history.push('/');
@@ -43,16 +47,14 @@ class RegisterContainer extends Component {
 											<Form.Control type="password" placeholder="Password" onChange={(e) => this.props.handleChangePassword(e.target.value)} />
 										</Form.Group>
 									</div>
+									<div style={{ display: "flex", justifyContent: "center" }}>
+										<Button variant="primary" type="submit" onClick={this._register} style={{ width: "150px", backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>
+											Register
+										</Button>
+									</div>
 								</Form>
 							</div>
-							<div style={{ display: "flex", justifyContent: "center" }}>
-								<Button variant="primary" type="submit" onClick={this._register} style={{ width: "150px", backgroundColor: "#18BC9C", border: "solid #18BC9C" }}>
-									Register
-  						</Button>
-							</div>
-							<Link style={{ color: "white", fontSize: "15px", display: "flex", justifyContent: "center" }}>
-								Create new account
-						</Link>
+							<p style={{color: 'red', fontSize: "100%", marginTop: "30px", textAlign: "center"}}>{ this.state.errMessage }</p>
 						</div>
 					</div>
 				</div>
@@ -60,26 +62,39 @@ class RegisterContainer extends Component {
 		);
 	}
 
-	_register = () => {
-		let params = new URLSearchParams();
-		params.append('username', this.props.username);
-		params.append('password', this.props.password);
-		axios({
-			method: 'POST',
-			data: params,
-			url: `${SERVER_URL}/register`
-		}).then(res => {
-			if (res) {
-				const resInfo = JSON.stringify(res.data);
-				const data = JSON.parse(resInfo);
-				if (data.token && data.token !== '') {
-					localStorage.setItem('token', data.token);
-					this.props.history.push('/');
+	_register = (e) => {
+		e.preventDefault();
+		if(this.props.username === '' || this.props.password === '') {
+			this.setState({
+				errMessage: 'Fields must not be blank'
+			});
+		}
+		else if(!this.props.username.match(/^[a-zA-Z0-9]{3,20}$/)) {
+			this.setState({
+				errMessage: 'Username should start at alphabet, number and has 3 - 20 characters'
+			});
+		}
+		else {
+			let params = new URLSearchParams();
+			params.append('username', this.props.username);
+			params.append('password', this.props.password);
+			axios({
+				method: 'POST',
+				data: params,
+				url: `${SERVER_URL}/register`
+			}).then(res => {
+				if (res) {
+					const resInfo = JSON.stringify(res.data);
+					const data = JSON.parse(resInfo);
+					if (data.token && data.token !== '') {
+						localStorage.setItem('token', data.token);
+						this.props.history.push('/');
+					}
 				}
-			}
-		}).catch(err => {
-			console.log(err);
-		})
+			}).catch(err => {
+				console.log(err);
+			});
+		}
 	}
 }
 

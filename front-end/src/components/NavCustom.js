@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
+import { setLogOut } from '../actions/actions';
+import { connect } from 'react-redux';
 
-class NavCustom extends Component {
+const mapDisPatchToProps = (disPatch) => {
+	return {
+		setLogOut: isLoggedOut => disPatch(setLogOut(isLoggedOut))
+	}
+}
+
+class NavCustomContainer extends Component {
 	render() {
 		return (
 			<Navbar sticky="top" style={{ backgroundColor: "#2C3E50", display: "flex", justifyContent: "center" }}>
@@ -14,7 +23,7 @@ class NavCustom extends Component {
 					</div>
 					<div className="container-nav-rank-logout">
 						<Nav style={{display: "flex", flexDirection: "row-reverse", height: "100%"}}>
-							<Nav.Link style={{ color: "white" }} href="/ranks">Log out</Nav.Link>
+							<Nav.Link style={{ color: "white" }} onClick={this._logOut}>Log out</Nav.Link>
 							<Nav.Link style={{ color: "white", marginRight: "20px" }} href="/ranks">Leaderboard</Nav.Link>
 							<img style={{ height: "80%" }} src="images/trophy.png"></img>
 						</Nav>
@@ -23,6 +32,12 @@ class NavCustom extends Component {
 			</Navbar>
 		);
 	}
+
+	_logOut = () => {
+		localStorage.removeItem('token');
+		this.props.setLogOut(true);
+	}
 }
 
+const NavCustom = connect(null, mapDisPatchToProps)(NavCustomContainer);
 export default NavCustom;

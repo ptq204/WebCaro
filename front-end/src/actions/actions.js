@@ -66,6 +66,10 @@ const markWatchLive = (payload) => {
     return {type: 'MARK_WATCH_LIVE', payload}
 }
 
+const setLogOut = (payload) => {
+    return {type: 'SET_LOGOUT', payload}
+}
+
 module.exports = {
     changeRoomList: changeRoomList,
     getUserInfo: getUserInfo,
@@ -83,5 +87,6 @@ module.exports = {
     changeRegisterPassword: changeRegisterPassword,
     changeInputRoomName: changeInputRoomName,
     changeRankList: changeRankList,
-    markWatchLive: markWatchLive
+    markWatchLive: markWatchLive,
+    setLogOut: setLogOut
 }

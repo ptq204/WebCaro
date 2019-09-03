@@ -19,7 +19,8 @@ const mapStateToProps = state => {
     userInfo: state.getUserInfo.user,
     currRoom: state.markCurrentRoom.roomId,
     inputRoomName: state.inputRoomName.roomName,
-    watchLive: state.markWatchLive.watchLive
+    watchLive: state.markWatchLive.watchLive,
+    isLoggedOut: state.setLogOut.isLoggedOut
   }
 }
 
@@ -140,7 +141,7 @@ class ConnectedHome extends Component {
 
   render() {
     const token = localStorage.getItem('token');
-    if (token && getUser(token)) {
+    if (token && getUser(token) && !this.props.isLoggedOut) {
       return (
         <div className="background-img">
           <div className="background-color-effect-dark">
@@ -175,7 +176,7 @@ class ConnectedHome extends Component {
                 <Col md={4} className="user-info">
                   <Row className="user-rank-info-container">
                     <Col xs={10} className="user-rank-info">
-                      <p className="user-rank-info-username">{this.props.userInfo.username} KKK</p>
+                      <p className="user-rank-info-username">{this.props.userInfo.username}</p>
                       <p className="user-rank-info-rank">Rank: {this.props.userInfo.rank} pts</p>
                     </Col>
                     <Col xs={2} className="user-rank-info-badge-container">
@@ -204,6 +205,7 @@ class ConnectedHome extends Component {
       );
     }
     else {
+      console.log('LOG OUT');
       return <Redirect to="/login"></Redirect>
     }
   }
